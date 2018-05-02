@@ -1,0 +1,359 @@
+body {
+	background-color: black;
+	font-family: verdana;
+	color: white;
+	cursor: default;
+}
+
+.bg {
+	background-color: black;
+	width: 100%;
+	height: 100%;
+	padding: 10% 0 0 0;
+}
+
+.outputDiv {
+	background-color: black;
+	height: 400px;
+	width: 600px;
+	border: 8px solid white;
+	border-radius: 25px;
+	margin: auto;
+	padding: 10px;
+	position: relative;
+	display: none;
+	text-align: justify;
+}
+
+
+/*text*/
+	p {
+		margin-left: 30px;
+		font-size: 1em;
+	}
+
+	p:hover {
+		color: yellow;
+	}
+
+	h1 {
+		color: #1ac6ff;
+		margin-left: 30px;
+		font-size: 1em;
+	}
+
+	h1:hover {
+		color: yellow;
+	}
+	
+
+/*GUI*/
+	#mapThumbnail {
+		background-image: url("map.jpg");
+		width: 150px;
+		height: 150px;
+		position: absolute;
+	}
+
+	#mapThumbnail:hover {
+		background-image: url("mapHover.png");
+		width: 130px;
+		height: 130px;
+		margin: 10px 0 0 10px;
+	}
+
+	#invThumbnail {
+		background-image: url("invThumbnail.png");
+		width: 150px;
+		height: 150px;
+		position: absolute;
+		right: 10px;
+		top: 10px;
+	}
+
+	#invThumbnail:hover {
+		width: 130px;
+		height: 130px;
+		margin: 10px 10px 0 0;
+	}
+	
+	#gold {
+		background-color: black;
+		width: 150px;
+		height: 30px;
+		margin: auto;
+		text-align: center;
+		line-height: 25px;
+	}
+	
+	#healthBarBG {
+		width: 50%;
+		height: 25px;
+		background-color: black;
+		border: 5px solid white;
+		border-radius: 3px;
+		margin: auto;
+	}
+	
+	#healthBar {
+		width: 0%;
+		height: 25px;
+		background-color: white;
+	}
+	
+	#healthLabel {
+		width: 200px;
+		margin: auto;
+		text-align: center;
+	}
+	
+	
+/*map*/
+	.iconCoord {
+		background-image: url("mapIcon.png");
+		height: 20px;
+		width: 20px;
+		position: absolute;
+	}
+
+	.iconCoord:hover {
+		background-image: url("mapIcon-hover.png");
+	}
+
+	#townIcon {
+		background-image: url("townIcon.png");
+		position: absolute;
+		left: 590px;
+		top: 10px;
+	}
+
+	#townIcon:hover {
+		background-image: url("townIcon-hover.png");
+	}
+
+
+/*town*/
+	.shopHotspot {
+		position: absolute;
+	}
+	
+	#town {
+		background-repeat: no-repeat; 
+		background-position: center center;
+	}
+	
+	
+/*inventory*/
+
+	.charItem {
+		background-repeat: no-repeat; 
+		background-position: center center;
+		height: 85px;
+		width: 85px;
+		border: 5px solid white;
+		border-radius: 15px;
+		position: absolute;
+	}
+	
+	.charItem:hover {
+		border: 5px solid yellow;
+	}
+	
+	.itemInv {
+		overflow-y: scroll;
+	}
+
+	.itemInv::-webkit-scrollbar {
+		display:none;
+	}
+	
+	.invItem {
+		background-repeat: no-repeat; 
+		background-position: center center;
+		width: 100px;
+		height: 100px;
+		border: 5px solid white;
+		border-radius: 15px;
+		margin: 5px;
+		display: inline-block;
+	}
+	
+	#weapon {
+		background-image: url('sword.png');
+		left: 415px;
+	}
+
+	#amulet {
+		background-image: url('amulet.png');
+		left: 515px;
+	}
+
+	#helmet {
+		background-image: url('helmet.png');
+		left: 415px;
+		top: 110px;
+	}
+
+	#armour {
+		background-image: url('armour.png');
+		left: 515px;
+		top: 110px;
+	}
+
+	#leggings {
+		background-image: url('leggings.png');
+		left: 415px;
+		top: 210px;
+	}
+
+	#boots {
+		background-image: url('boots.png');
+		left: 515px;
+		top: 210px;
+	}
+	
+	#cons {
+		background-image: url('food.png');
+		width: 150px;
+		left: 250px;
+		top: 210px;
+	}
+	
+	#statsHover {
+		width: 150px;
+		height: 185px;
+		border: 5px solid white;
+		border-radius: 15px;
+		position: absolute;
+		left: 250px;
+		text-align: left;
+	}
+
+	#fullInvScr {
+		width: 350px;
+		height: 50px;
+		border: 5px solid white;
+		border-radius: 15px;
+		position: absolute;
+		left: 250px;
+		top: 330px;
+		font-size: 1.5em;
+		vertical-align: middle;
+		text-align: center;
+		line-height: 50px;
+	}
+	
+	#fullInvScr:hover {
+		border: 5px solid yellow;
+	}
+	
+	#personOutline {
+		background-image: url("personOutline.png");
+		margin-top: 10px;
+		position: absolute;
+		height: 380px;
+		width: 250px;
+	}
+	
+	#statsHover {
+		text-transform: capitalize;
+		z-index: 1;
+	}
+	
+	#statsHoverName {
+		width: 100%;
+		text-align: center;
+	}
+	
+	#statsHoverContent {
+		width: 100%;
+		padding-left: 5px;
+	}
+
+
+/*shop*/
+	.shopItem {
+		background-repeat: no-repeat; 
+		background-position: center center;
+		width: 100px;
+		height: 100px;
+		border: 5px solid white;
+		border-radius: 15px;
+		margin: 5px;
+	}
+
+	.shopItem:hover {
+		border: 5px solid yellow;
+	}
+
+	.shopPrice {
+		width: 110px;
+		height: 20px;
+		display: inline-block;
+		margin: 5px;
+		text-align: center;
+	}
+
+	#shopWelcome {
+		margin: 10px 0px;
+		font-size: 2em;
+		text-align: center;
+	}
+
+	#bar {
+		background-color: white;
+		width: 600px;
+		height: 20px;
+		margin-bottom: 5px;
+	}
+	
+	#backButton {
+		background-color: white;
+		width: 50px;
+		height: 20px;
+		margin: auto;
+		display: none;
+	}
+
+	#backButton:hover {
+		background-color: yellow;
+	}
+	
+	#shopAnnouncement {
+		width: 600px;
+		height: 30px;
+		margin: auto;
+		display: none;
+		font-size: 1.5em;
+		text-align: center;
+	}
+	
+
+/*tooltips*/
+	.tooltip {
+		position: relative;
+		display: inline-block;
+	}
+
+	.tooltip .tooltiptext {
+		background-color: black;
+		width: 150px;
+		border: 5px solid white;
+		border-radius: 6px;
+		padding: 5px;
+		position: absolute;
+		left: 110%;
+		top: -5px;
+		visibility: hidden;
+		text-align: left;
+		text-transform: capitalize;
+		color: #fff;
+		opacity: 0;
+		transition: opacity 0.5s;
+		z-index: 1;
+	}
+
+	.tooltip:hover .tooltiptext {
+		visibility: visible;
+		opacity: 1;
+	}

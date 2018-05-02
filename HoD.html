@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<link rel = "stylesheet" href = "HoD.css">
+	</head>
+
+	<body onload = "genMap(), changeOut(100, 'startingMenu'), document.getElementById('output').style.display = 'block', invItemHoverOut(), player.setUpPlayer()">
+		
+		<div id = "mapThumbnail" onclick = "nav.open('map')"></div>
+		<div id = "invThumbnail" onclick = "nav.open('inventory')"></div>
+		<div id = "gold">26 gold</div>
+		<div id = "healthBarBG">
+			<div id = "healthBar"></div>
+		</div>
+		<div id = "healthLabel"></div>
+		
+		<div class = "bg">
+		
+			<div class = "outputDiv" id = "inventory">
+			
+				<div id = "statsHover">
+					<div id = "statsHoverName"></div>
+					<div id = "statsHoverContent"></div>
+				</div>
+				<div id = "personOutline"></div>
+				<div class = "charItem" id = "weapon" onclick = "nav.open('weaponInv'), popInv('weapon'), document.getElementById('backButton').style.display = 'block'" onmouseover = "invItemHover('weapon')" onmouseout = "invItemHoverOut()"></div>
+				<div class = "charItem" id = "helmet" onclick = "nav.open('helmetInv'), popInv('helmet'), document.getElementById('backButton').style.display = 'block'" onmouseover = "invItemHover('helmet')" onmouseout = "invItemHoverOut()"></div>
+				<div class = "charItem" id = "armour" onclick = "nav.open('armourInv'), popInv('armour'), document.getElementById('backButton').style.display = 'block'" onmouseover = "invItemHover('armour')" onmouseout = "invItemHoverOut()"></div>
+				<div class = "charItem" id = "amulet" onclick = "nav.open('amuletInv'), popInv('amulet'), document.getElementById('backButton').style.display = 'block'" onmouseover = "invItemHover('amulet')" onmouseout = "invItemHoverOut()"></div>
+				<div class = "charItem" id = "leggings" onclick = "nav.open('leggingsInv'), popInv('leggings'), document.getElementById('backButton').style.display = 'block'" onmouseover = "invItemHover('leggings')" onmouseout = "invItemHoverOut()"></div>
+				<div class = "charItem" id = "boots" onclick = "nav.open('bootsInv'), popInv('boots'), document.getElementById('backButton').style.display = 'block'" onmouseover = "invItemHover('boots')" onmouseout = "invItemHoverOut()"></div>
+				<div class = "charItem" id = "cons" onclick = "nav.open('consInv'), popInv('cons'), document.getElementById('backButton').style.display = 'block'"></div>
+				<div id = "fullInvScr" onclick = "nav.open('fullInv'), popInv('full'), document.getElementById('backButton').style.display = 'block'">Inventory</div>
+			
+			</div>
+			
+			<div class = "outputDiv itemInv" id = "weaponInv"></div>
+			<div class = "outputDiv itemInv" id = "helmetInv"></div>
+			<div class = "outputDiv itemInv" id = "leggingsInv"></div>
+			<div class = "outputDiv itemInv" id = "amuletInv"></div>
+			<div class = "outputDiv itemInv" id = "armourInv"></div>
+			<div class = "outputDiv itemInv" id = "bootsInv"></div>
+			<div class = "outputDiv itemInv" id = "potionsInv"></div>
+			<div class = "outputDiv itemInv" id = "consInv"></div>
+			<div class = "outputDiv itemInv" id = "fullInv"></div>
+			
+			<div class = "outputDiv" id = "town"></div>
+			<div class = "outputDiv" id = "map"></div>
+			
+			<div class = "outputDiv interaction" id = "fight">
+				<div id = "player">
+					<div class = "names" id = "playerName">You</div>
+					<div class = "fightPic" id = "playerPic">player</div>
+					<div class = "fightStats" id = "playerStats"></div>
+					<div class = "fightOptions" id = "fightOpt" onclick = "fight.attack(true)">fight</div>
+					<div class = "fightOptions" id = "consOpt" onclick = "nav.open('consInv'), popInv('cons'), document.getElementById('backButton').style.display = 'block'">eat</div>
+				</div>
+				<div id = "enemy">
+					<div class = "names" id = "enemyName"></div>
+					<div class = "fightPic" id = "enemyPic">enemy</div>
+					<div class = "fightStats" id = "enemyStats"></div>
+					<div id = "enemyIntention">intention</div>
+					<div id = "enemyHealthBarBG">
+						<div id = "enemyHealthBar"></div>
+					</div>
+				</div>
+				<div id = "middleBar"></div>
+			</div>
+			<div id = "enemyHealthLabel"></div>
+			
+			<div class = "outputDiv shop" id = "merchant"></div>
+			<div class = "outputDiv shop" id = "aMerchant"></div>
+			<div class = "outputDiv shop" id = "smithy"></div>
+			<div class = "outputDiv shop" id = "inn">
+				<div id = "innOut"></div>
+				<p id = "innPara1"></p>
+				<p id = "innPara2"></p>
+			</div>
+			<div id = "backButton" onclick = "nav.back()"></div>
+			<div id = "shopAnnouncement"></div>
+		
+			<div class = "outputDiv" id = "output">
+				<div id = "outputContent"></div>
+				<p id = "opt1"></p>
+				<p id = "opt2"></p>
+				<h1 id = "blueOpt"></h1>
+			</div>
+
+			<div class = "outputDiv interaction" id = "victoryScreen">
+				<div id = "victoryMessage1">Victory!</div>
+				<div id = "victoryMessage2" onclick = "genLoot()">Continue</div>
+			</div>
+			
+			<div class = "outputDiv interaction" id = "defeat">You lost</div>
+	
+			<div class = "outputDiv interaction" id = "loot">loot</div>
+		
+		</div>
+		
+	</body>
+	
+	<script src = "objLookupTest.js"></script>
+	<script>
+	
+		var mapArray = [];
+		var merchantItems = [];
+		var aMerchantItems = [];
+		var smithyItems = [];
+		var pointNo = 0;
+		var pointsCleared = 0;
+		var innOpen = Math.floor(Math.random() * 2);
+		var innOut = Math.floor(Math.random() * 3) + 1;
+		var innSlept = false;
+		var inBattle = false;
+		
+		var player = {
+		
+			health: {
+				base: 100,
+				current: 100,
+				bonus: 0,
+			},
+			attack: {
+				base: 10,
+				current: 10,
+				bonus: 0,
+			},
+			defense: {
+				base: 10,
+				current: 10,
+				bonus: 0,
+			},
+			charisma: {
+				base: 10,
+				current: 10,
+				bonus: 0,
+			},
+			intelligence: {
+				base: 10,
+				current: 10,
+				bonus: 0,
+			},
+			gold: 1000,
+			inventory: [],
+			equipped: [],
+			
+			setUpPlayer: function() {
+				player.changeHealth(0);
+				player.changeGold(0);
+				player.setUpEquipment();
+			},
+			
+			setUpEquipment: function() {
+				for (i = 0; i < 6; i++) {
+					var item = new Item;
+					switch (i) {
+						case 0: item.type = "helmet";
+									break;
+						case 1: item.type = "amulet";
+									break;
+						case 2: item.type = "armour";
+									break;
+						case 3: item.type = "leggings";	
+									break;
+						case 4: item.type = "boots";
+									break;
+						case 5: item.type = "sword";
+									break;
+					}
+					item.name = "";
+					item.consumable = false;
+					item.regen = 0;
+					item.health = 0;
+					item.attack = 0;
+					item.defense = 0;																						
+					item.charisma = 0;
+					item.intelligence = 0;
+					item.power = 0;
+					player.equipped.push(item);
+				}
+			},
+			
+			changeHealth: function(health) {
+				var healthChanged = false;
+				if (player.health.current <= (player.health.base + player.health.bonus) || health > 0) {
+					player.health.current += health;
+					healthChanged = true;
+				}
+				if (player.health.current <= 0) player.die();
+				if (player.health.current > (player.health.base + player.health.bonus)) player.health.current = (player.health.base + player.health.bonus);
+				document.getElementById("healthBar").style.width = ((player.health.current / (player.health.base + player.health.bonus)) * 100) + "%";
+				document.getElementById("healthLabel").innerHTML = player.health.current + "/" + (player.health.base + player.health.bonus) + "hp";
+				return healthChanged;
+			},
+			
+			changeGold: function(gold) {
+				if (gold > player.gold) return false;
+				player.gold -= gold;
+				document.getElementById("gold").innerHTML = player.gold + " gold"
+				return true;
+			},
+			
+			updateStats: function() {
+				player.health.current = player.health.base + player.equipped[0].health + player.equipped[2].health + player.equipped[3].health + player.equipped[4].health;
+				player.attack.current = player.attack.base + player.equipped[1].attack + player.equipped[5].attack;
+				player.defense.current = player.defense.base + player.equipped[0].defense + player.equipped[2].defense + player.equipped[3].defense + player.equipped[4].defense;
+				player.charisma.current = player.charisma.base + player.equipped[1].charisma;
+				player.intelligence.current = player.intelligence.base + player.equipped[1].intelligence + player.equipped[5].intelligence;
+			},
+			
+			changeStat: function(stat, amount) {
+				player[stat].bonus += amount;
+				player.updateStats();
+			},
+		
+			die: function() {
+				nav.open('defeat');
+				document.getElementById('enemyHealthBarBG').style.display = 'none';
+				document.getElementById('enemyHealthLabel').style.display = 'none';
+				inBattle = false;
+			},
+		
+		};
+	
+		var nav = {
+		
+			prevOpenDiv: "",
+		
+			open: function(ID) {
+
+				var list = document.getElementsByClassName('outputDiv');
+				var num = list.length;
+			
+				for (i = 0; i < num; i++) {
+				
+					if (list[i].style.display == 'block') {
+					
+						if (list[i].classList.contains('interaction') && (ID == 'inventory') && (list[i].id != 'openingMenuScr2')) return 0;
+						list[i].style.display = 'none';
+						prevOpenDiv = list[i];
+						
+					}
+				
+				}
+				
+				document.getElementById('shopAnnouncement').style.display = 'none';
+				document.getElementById('backButton').style.display = 'none';
+				document.getElementById(ID).style.display = 'block';
+			
+			},
+		
+			back: function() {
+			
+				var list = document.getElementsByClassName('outputDiv');
+				var num = list.length;
+				
+				for (j = 0; j < num; j++) list[j].style.display = 'none';
+	
+				prevOpenDiv.style.display = 'block';
+				document.getElementById('backButton').style.display = 'none';
+				document.getElementById('shopAnnouncement').style.display = 'none';
+				
+			}
+		
+		}
+	
+		var fight = {
+		
+			playerTurn: true,
+			enemy: null,
+			
+			setUpFight: function(enemyType) {
+				nav.open('fight');
+				this.enemy = this.genEnemy(enemyType);
+				this.playersTurn = true;
+				inBattle = true;
+				this.changeEnemyHealth(0);
+				document.getElementById('enemyHealthBarBG').style.display = 'block';
+				document.getElementById('enemyHealthLabel').style.display = 'block';
+				document.getElementById('playerName').style.color = 'yellow';
+				document.getElementById('enemyName').innerHTML = this.enemy.name;
+				
+				var randInt = Math.floor(Math.random() * 5) + 1;
+				if (randInt > 4) this.enemy.intention = 'block';
+				else this.enemy.intention = 'attack';
+				document.getElementById('enemyIntention').innerHTML = this.enemy.intention;
+				
+				this.outputStats()
+			},
+			
+			outputStats: function() {
+				var output = "";
+				output += "Attack: " + player.attack.current + "<br>";
+				output += "Defense: " + player.defense.current + "<br>";
+				output += "Charisma: " + player.charisma.current + "<br>";
+				output += "Intelligence: " + player.intelligence.current + "<br>";
+				document.getElementById('playerStats').innerHTML = output;
+				
+				output = "Attack: " + this.enemy.attack + "<br>";
+				output += "Defense: " + this.enemy.defense + "<br>";
+				document.getElementById('enemyStats').innerHTML = output;
+			},
+			
+			attack: function(playersTurn) {
+				if (!this.playerTurn && playersTurn) return;
+				var damage = 0;
+				var enemyDead = false;
+				var dmgUp, dmgDown;
+				var x;
+				if (playersTurn) {
+					if (player.equipped[5].type == 'sword') {
+						x = this.enemy.defense;
+						if (x > 75) x = 75;
+						damage = Math.floor(player.attack.current - (player.attack.current * (x/100)));
+					} else {
+						damage = Math.floor(player.intelligence.current - (player.inteligence.current * (x/100)));
+					}
+					dmgUp = Math.round(damage + (damage * 0.1));
+					dmgDown = Math.round(damage - (damage * 0.1));
+					damage = Math.floor(Math.random() * (dmgUp - dmgDown)) + dmgDown;
+					enemyDead = this.changeEnemyHealth(damage);
+				} else {
+					x = player.defense.current;
+					if (x > 75) x = 75;
+					damage = Math.floor(this.enemy.attack - (this.enemy.attack *(x/100)));
+					dmgUp = Math.round(damage + (damage * 0.1));
+					dmgDown = Math.round(damage - (damage * 0.1));
+					damage = Math.floor(Math.random() * (dmgUp - dmgDown)) + dmgDown;
+					player.changeHealth(-damage);
+				}
+				if (playersTurn && !enemyDead) { 
+					document.getElementById('playerName').style.color = 'white';
+					document.getElementById('enemyName').style.color = 'yellow';
+					this.playerTurn = false;
+					setTimeout(function () { fight.enemyTurn(); }, 1000);
+				}
+			},
+		
+			enemyTurn: function() {
+				if (this.enemy.intention == 'attack') { this.attack(false) }
+				else if (this.enemy.intention == 'block') { 
+					this.enemy.defense++;
+					this.outputStats();
+				}
+				this.playerTurn = true;
+				document.getElementById('playerName').style.color = 'yellow';
+				document.getElementById('enemyName').style.color = 'white';
+				
+				var randInt = Math.floor(Math.random() * 5) + 1;
+				if (randInt > 4) this.enemy.intention = 'block';
+				else this.enemy.intention = 'attack';
+				document.getElementById('enemyIntention').innerHTML = this.enemy.intention;
+			},
+			
+			changeEnemyHealth: function(damage) {
+				var enemyDead = false;
+				this.enemy.hp -= damage;
+				if (this.enemy.hp <= 0) {
+					enemyDead = true;
+					this.enemy.hp = 0;
+				}
+				document.getElementById("enemyHealthBar").style.width = ((this.enemy.hp / this.enemy.health) * 100) + "%";
+				document.getElementById("enemyHealthLabel").innerHTML = this.enemy.hp + "/" + this.enemy.health + "hp";
+				if (enemyDead) this.victory();
+				return enemyDead;
+			},
+			
+			genEnemy: function(type) {
+				var enemy = new Enemy;
+				var percentCleard = Math.floor((pointsCleared / pointNo) * 100);
+			
+				enemy.name = type;
+				enemy.attack = Math.floor(Math.random() * 3) + 6;
+				enemy.defense = Math.floor(Math.random() * 2) + 3;
+				enemy.health = Math.floor(Math.random() * 20) + 30;
+				enemy.intention = 'attack';
+				enemy.hp = enemy.health;
+				return enemy;
+			},
+			
+			victory: function(){
+				document.getElementById('enemyHealthBarBG').style.display = 'none';
+				document.getElementById('enemyHealthLabel').style.display = 'none';
+				nav.open('victoryScreen');
+				inBattle = false;
+			}
+			
+		}
+	
+		function Item(type, name, consumable, regen, health, attack, defense, charisma, intelligence, power, cost) {
+			this.type = type;
+			this.name = name;
+			this.consumable = consumable;
+			this.regen = regen;
+			this.health = health;
+			this.attack = attack;
+			this.defense = defense;
+			this.charisma = charisma;
+			this.intelligence = intelligence;
+			this.power = power;
+			this.cost = cost;																										//creates an object template for an item that can be reused
+		}
+		
+		function Enemy(name, health, hp, intention, attack, defense) {
+			this.name = name;
+			this.health = health;
+			this.hp = hp;
+			this.intention = intention;
+			this.attack = attack;
+			this.defense = defense;
+		}
+		
+		function invItemHover(itemType) {			//sets the output div to the stats of the equipped item of that type when you hover over it
+		
+			var output = "";																																	//initialises output
+			
+			for (i = 0; i < player.equipped.length; i++) {
+				if (player.equipped[i].type == itemType || (itemType == 'weapon' && (player.equipped[i].type == 'sword' || player.equipped[i].type == 'staff'))) {
+					item = player.equipped[i];
+					break;
+				}
+			}																																							//sets the var 'item' to the item being hovered over so i know what type it is
+			
+			document.getElementById('statsHoverName').innerHTML = item.type;												//sets the title to the type of item (will later be the name of the item)
+			
+			for (x in item) {																																	//for every property in 'item'
+				if (x != 'consumable' && x != 'cost' && x != 'inShop' && x != 'type' && item[x] != "")						//some properties i dont want to show in the shop tooltip, and if its not blank
+					output +=  x + ': ' + item[x] + '<br>';																							//add the property and its value to the output variable
+			}
+		
+			document.getElementById('statsHoverContent').innerHTML = output;												//sets the innerHTML of the output to the output variable worked out above
+		
+		}
+		
+		function invItemHoverOut() {					//set the output div back to the players stats when unhovered over
+		
+			var output = ""																							//initialises output
+			
+			document.getElementById('statsHoverName').innerHTML = "Stats"
+			
+			output += "Attack: " + player.attack.current + "<br>";
+			output += "Defense: " + player.defense.current + "<br>";
+			output += "Charisma: " + player.charisma.current + "<br>";
+			output += "Intelligence: " + player.intelligence.current + "<br>";							//adds all of the relevent players stats to the output var
+			
+			document.getElementById('statsHoverContent').innerHTML = output;		//sets the output div to the output var
+		
+		}
+		
+		function genMap() {								//generates the points on the map and selects their interactions
+		
+			var pointCoord = 0;
+			var x = 0, y = 0;
+			var div;
+			var pointsTaken = [];
+			
+			//pointNo = Math.floor((Math.random() * 5) + 15);													//generates the amount of map points and saves it to a global variable for later use
+			pointNo = 7;																											//temp bugtesting line
+			
+			for (i = 1; i <= pointNo; i++) {
+				pointsTaken[i] = false;
+			}
+		
+			for (var i = 0; i < 20; i++) {
+			
+				mapArray[i+1] = new Array();
+				
+				for (var j = 0; j < 30; j++) {
+					mapArray[i+1][j+1] = '';
+				}
+				
+			}																																//makes every y value in the array an array to make it 2d
+
+			mapArray[1][30] = 't';
+			
+			div = document.createElement('div');
+			div.setAttribute('id', 'townIcon');
+			div.setAttribute('class', 'iconCoord');
+			div.setAttribute('onclick', 'nav.open("town")');														//creates the icon for a town (special exception hence the hardcoding)
+			
+			document.getElementById('map').appendChild(div);
+			
+			genTown();																												//calls the function which generates the layout, hotspots and functionality of the town
+		
+			for (var k = 0; k < pointNo; k++) {																			//for every point to be generated...
+			
+				pointCoord = Math.floor(Math.random() * 600);													//generates where the point will go on the map
+			
+				y = (parseInt(pointCoord/30) + 1);																		//gens y coord from the random number
+				x = ((pointCoord % 30) + 1);																				//gens x coord from the random number
+				
+				if (mapArray[y][x] == '') {																					//if the space is empty...
+				
+					do {
+						interactionNo = (Math.floor(Math.random() * 7)) + 1;									//generates the interaction that will be at this map point
+					} while (pointsTaken[interactionNo] === true)												//makes sure the interaction selected for that point isnt already taken in another encounter
+					
+					pointsTaken[interactionNo] = true;																	//sets that interaction to taken
+					
+					//interactionNo = 5;																							//hardcodes the encounter that will happen so i can test them (bugtesting line)
+				
+					var divID = 'openingScr' + interactionNo;
+					div = document.createElement('div');																//puts a div in a variable called 'div', currently has no attributes or properties
+					div.setAttribute('class', 'iconCoord');																//sets the class to 'mapCoord'
+					div.setAttribute('id', 'coord' + (y) + ',' + (x));													//sets the id to 'coord' then the x and y coordinate
+					div.setAttribute('onclick', 'nav.open("output"), ' 
+													+ 'changeOut(100, "openingScr' + interactionNo + '")');	//gives the div an onclick function to close the map and open the interaction (wip)
+					div.style.left = ((x * 20) - 10) + 'px';																//positions the new div along the x axis
+					div.style.top = ((y * 20) - 10) + 'px';																//positions the new div along the y axis
+					
+					document.getElementById('map').appendChild(div);										//appends the div to the element with id 'map'
+				
+					mapArray[y][x] = 'o';																						//'o' for occupied, 'c' for cleared, 't' for town
+					
+				} else {																												//if the space is already taken...
+				
+					k--;																													//put the iterator back one so it loops again
+				
+				}
+				
+			}
+		
+		}
+	
+		function genTown() {								//generates the hotspots on the town so you can click them and visit them
+			
+			var randInt = (Math.floor(Math.random() * 3) + 1);																	//decides which map will be chosen for this playthrough
+			var div;
+		
+			switch(randInt) {																															//checks the value of randInt (nicer than if/elseif/else)
+				case 1:																																	//if 1...
+					document.getElementById('town').style.backgroundImage = "url(townLayout1.png)";		//set the town div to have the 1st layout as its background
+					
+					div = document.createElement('div');																					//hotspot on the inn so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot inn');
+					div.setAttribute('id', 'inn1')
+					div.setAttribute('onclick', 'nav.open("inn"), genInn()');
+					div.style.top = '14px';
+					div.style.left = '14px';
+					div.style.height  = '167px';
+					div.style.width = '97px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout1IHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout1.png)"}
+					
+					document.getElementById('town').appendChild(div);
+					
+					div = document.createElement('div');																					//hotspot on the smithy so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot smithy');
+					div.setAttribute('id', 'smithy1p1')
+					div.setAttribute('onclick', 'nav.open("smithy"), document.getElementById("backButton").style.display = "block"');
+					div.style.top = '241px';
+					div.style.left = '86px';
+					div.style.height  = '53px';
+					div.style.width = '186px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout1SHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout1.png)"}
+					
+					document.getElementById('town').appendChild(div);
+					
+					div = document.createElement('div');																					//hotspot on the smithy so you can click it and visit it (compund shape so 2 parts)
+					div.setAttribute('class', 'shopHotspot smithy');
+					div.setAttribute('id', 'smithy1p2')
+					div.setAttribute('onclick', 'nav.open("smithy"), document.getElementById("backButton").style.display = "block"');
+					div.style.top = '294px';
+					div.style.left = '179px';
+					div.style.height  = '112px';
+					div.style.width = '93px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout1SHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout1.png)"}
+					
+					document.getElementById('town').appendChild(div);
+					
+					div = document.createElement('div');																					//hotspot on the merchant so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot merchant');
+					div.setAttribute('id', 'merchant1')
+					div.setAttribute('onclick', 'nav.open("merchant"), document.getElementById("backButton").style.display = "block"');
+					div.style.top = '105px';
+					div.style.left = '171px';
+					div.style.height  = '76px';
+					div.style.width = '246px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout1MHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout1.png)"}
+					
+					document.getElementById('town').appendChild(div);
+					
+					div = document.createElement('div');																					//hotspot on the arcane merchant so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot aMerchant');
+					div.setAttribute('id', 'aMerchant1')
+					div.setAttribute('onclick', 'nav.open("aMerchant"), document.getElementById("backButton").style.display = "block"');
+					div.style.top = '241px';
+					div.style.left = '404px';
+					div.style.height  = '62px';
+					div.style.width = '202px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout1AMHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout1.png)"}
+					
+					document.getElementById('town').appendChild(div);
+					
+					break;
+					
+				case 2:
+					document.getElementById('town').style.backgroundImage = "url(townLayout2.png)";
+					
+					div = document.createElement('div');																					//hotspot on the inn so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot inn');
+					div.setAttribute('id', 'inn2p1')
+					div.setAttribute('onclick', 'nav.open("inn"), genInn()');
+					div.style.top = '252px';
+					div.style.left = '439px';
+					div.style.height  = '59px';
+					div.style.width = '73px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout2IHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout2.png)"}
+					
+					document.getElementById('town').appendChild(div);
+		
+					div = document.createElement('div');																					//hotspot on the smithy so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot inn');
+					div.setAttribute('id', 'inn2p2')
+					div.setAttribute('onclick', 'nav.open("inn"), genInn()');
+					div.style.top = '311px';
+					div.style.left = '457px';
+					div.style.height  = '95px';
+					div.style.width = '55px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout2IHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout2.png)"}
+					
+					document.getElementById('town').appendChild(div);
+
+					div = document.createElement('div');																					//hotspot on the smithy so you can click it and visit it (compund shape so 2 parts)
+					div.setAttribute('class', 'shopHotspot smithy');
+					div.setAttribute('id', 'smithy2')
+					div.setAttribute('onclick', 'nav.open("smithy"), document.getElementById("backButton").style.display = "block"');
+					div.style.top = '135px';
+					div.style.left = '179px';
+					div.style.height  = '59px';
+					div.style.width = '185px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout2SHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout2.png)"}
+				
+					document.getElementById('town').appendChild(div);
+	
+					div = document.createElement('div');																					//hotspot on the merchant so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot merchant');
+					div.setAttribute('id', 'merchant2')
+					div.setAttribute('onclick', 'nav.open("merchant"), document.getElementById("backButton").style.display = "block"');
+					div.style.top = '131px';
+					div.style.left = '60px';
+					div.style.height  = '154px';
+					div.style.width = '59px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout2MHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout2.png)"}
+					
+					document.getElementById('town').appendChild(div);
+	
+					div = document.createElement('div');																					//hotspot on the arcane merchant so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot aMerchant');
+					div.setAttribute('id', 'aMerchant2')
+					div.setAttribute('onclick', 'nav.open("aMerchant"), document.getElementById("backButton").style.display = "block"');
+					div.style.top = '134px';
+					div.style.left = '422px';
+					div.style.height  = '59px';
+					div.style.width = '143px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout2AMHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout2.png)"}
+					
+					document.getElementById('town').appendChild(div);
+					
+					break;
+					
+				case 3:
+					document.getElementById('town').style.backgroundImage = "url(townLayout3.png)";
+					
+					div = document.createElement('div');																					//hotspot on the inn so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot inn');
+					div.setAttribute('id', 'inn3p1')
+					div.setAttribute('onclick', 'nav.open("inn"), genInn()');
+					div.style.top = '106px';
+					div.style.left = '271px';
+					div.style.height  = '72px';
+					div.style.width = '175px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout3IHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout3.png)"}
+					
+					document.getElementById('town').appendChild(div);
+
+					div = document.createElement('div');																					//hotspot on the inn so you can click it and visit it (compound shape so 2 parts)
+					div.setAttribute('class', 'shopHotspot inn');
+					div.setAttribute('id', 'inn3p2')
+					div.setAttribute('onclick', 'nav.open("inn"), genInn()');
+					div.style.top = '64px';
+					div.style.left = '271px';
+					div.style.height  = '42px';
+					div.style.width = '72px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout3IHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout3.png)"}
+					
+					document.getElementById('town').appendChild(div);
+
+					div = document.createElement('div');																					//hotspot on the smithy so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot smithy');
+					div.setAttribute('id', 'smithy3p1')
+					div.setAttribute('onclick', 'nav.open("smithy"), document.getElementById("backButton").style.display = "block"');
+					div.style.top = '237px';
+					div.style.left = '75px';
+					div.style.height  = '52px';
+					div.style.width = '138px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout3SHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout3.png)"}
+					
+					document.getElementById('town').appendChild(div);
+					
+					div = document.createElement('div');																					//hotspot on the smithy so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot smithy');
+					div.setAttribute('id', 'smithy3p2')
+					div.setAttribute('onclick', 'nav.open("smithy"), document.getElementById("backButton").style.display = "block"');
+					div.style.top = '289px';
+					div.style.left = '161px';
+					div.style.height  = '45px';
+					div.style.width = '52px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout3SHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout3.png)"}
+					
+					document.getElementById('town').appendChild(div);
+		
+					div = document.createElement('div');																					//hotspot on the merchant so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot merchant');
+					div.setAttribute('id', 'merchant3')
+					div.setAttribute('onclick', 'nav.open("merchant"), document.getElementById("backButton").style.display = "block"');
+					div.style.top = '126px';
+					div.style.left = '14px';
+					div.style.height  = '52px';
+					div.style.width = '144px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout3MHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout3.png)"}
+					
+					document.getElementById('town').appendChild(div);
+
+					div = document.createElement('div');																					//hotspot on the arcane merchant so you can click it and visit it
+					div.setAttribute('class', 'shopHotspot aMerchant');
+					div.setAttribute('id', 'aMerchant3')
+					div.setAttribute('onclick', 'nav.open("aMerchant"), document.getElementById("backButton").style.display = "block"');
+					div.style.top = '236px';
+					div.style.left = '476px';
+					div.style.height  = '52px';
+					div.style.width = '131px';
+					div.onmouseover = function(){document.getElementById('town').style.backgroundImage = "url(townLayout3AMHover.png)"};
+					div.onmouseout = function(){document.getElementById('town').style.backgroundImage = "url(townLayout3.png)"}
+					
+					document.getElementById('town').appendChild(div);
+					
+					break;
+			}
+			
+			genInn();
+			genShop('merchant');																													//generates the layouts for the 3 shops in the town
+			genShop('aMerchant');																												//the inn will be a serperate function as it will have a different layout 
+			genShop('smithy');
+		
+		}
+		
+		function genInn() {									//determines what the output for the inn should be when opened and sets it
+			
+			var out = document.getElementById('innOut');
+			var para1 = document.getElementById('innPara1');
+			var para2 = document.getElementById('innPara2');
+			
+			if (!innSlept) {
+			
+				if (innOpen == 1) {
+				
+					switch (innOut) {
+						case 1: 
+							out.innerHTML = "You can hear the cheers of tennants inside enjoying their mugs of ale and decide that this could be a good place to spend the night and walk in. The cosy aesthetic of the inn is striking, a roaring fireplace in the middle of the "
+							+ "room is keeping the room light and warm. You see elves and even a few humans filling out all of the tables at the inn. Clearly this place is popular. You walk up to the inn keeper, \"What'll it be friend?\".";
+							break;
+						case 2:
+							out.innerHTML = "You walk into the inn, everyone seems cheery enough, chatting over mugs of ale and cups of wine. You see the inn keeper behind the bar, an upbeat looking man who also seems like he's broken up enough bar brawls in his time. You walk over to the "
+							+ "bar and wait to be served. The keeper walks over to you, \"What can i get for you?\" he said in his jolly voice.";
+							break;
+						case 3:
+							out.innerHTML = "Walking into the inn, you hear the noise of the merry chatter between tennants, telling overly exaggeratted stories about one of the many times they done something amazingly heroic. As well as elves you notice a few humans scattered around and "
+							+ "decide that this could be a good play to rest for the night. You approach the inn keeper, \"What can I do you for on this fine evening sir?\".";
+							break;
+					}
+					
+					para1.innerHTML = "1. 	\"A room for the night and a jug of your finest ale please\" (heals you for 50% of your missing hp - " + ((player.health.base + player.health.bonus) - player.health.current) / 2 + ")";
+					para1.setAttribute('onclick', 'stayNight()');
+					para2.innerHTML = "2. 	\"Hmmm, maybe another time\"";
+					para2.setAttribute('onclick', 'nav.open("town")');
+					
+				} else {
+					
+					out.innerHTML = "You stroll up to the inn to see a sign hung on the door with big letters, \"NO MORE ROOMS LEFT\".";
+					para1.innerHTML = "1. 	Dammit";
+					para1.setAttribute('onclick', 'nav.open("town")');
+					para2.innerHTML = "";
+					
+				}
+				
+			} else {
+			
+				out.innerHTML = "You've already slept the night, you should really go out adventuring again. Maybe sleep here again tonight...";
+				para1.innerHTML = "1. 	To adventure!";
+				para1.setAttribute('onclick', 'nav.open("town")');
+				para2.innerHTML = "";
+			
+			}
+	
+		}
+		
+		function stayNight() {								//gives you health when you stay the night at an inn
+			
+			var out = document.getElementById('innOut');
+			var para1 = document.getElementById('innPara1');
+			var para2 = document.getElementById('innPara2');
+
+			innSlept = player.changeHealth(((player.health.base + player.health.current) - player.health.current) / 2);
+			if (!innSlept) return 0;
+			
+			out.innerHTML = "\"Of course!\", the inn keeper shouts, much louder than necessary. \"Take a seat and everything will be ready before you know it\". He hands you a mug full to the brim of frothy ale and you head to one of the few free seats in the room and take a seat. "
+			+ "You take a looooong gulp of your ale...";
+			para1.innerHTML = "1. 	Ahhhh, much better!";
+			para1.setAttribute('onclick', 'nav.open("town")');
+			para2.innerHTML = "";
+			
+			innSlept = true;
+			
+		}
+		
+		function genShop(shop) {						//generates the look and functionaity of the shops
+		
+			var pos = 0;
+			var div = document.createElement('div');
+	
+			div.setAttribute('id', 'shopWelcome');
+			if (shop == 'aMerchant') {
+				div.innerHTML = 'Welcome to the arcane merchant';
+			} else {
+				div.innerHTML = 'Welcome to the ' + shop;																			//creates the welcome text at the top of the shop (aMerchant is hardcoded as the shop isnt stored as 'arcane merchant')
+			}
+			
+			document.getElementById(shop).appendChild(div);																//appends it to the div
+		
+			for (j = 0; j < 2;  j++) {																											//the code only generates one row of the shop so it has to be done twice
+		
+				for (i = 0; i < 5; i++) {																											//the code generates one item in the shop so repeats it 5 times
+				
+					pos = ((j * 5) + i);																											//works out which number the div is (0 being top left, 9 bottom right, starting from 0 as the array storing the items will be 0 indexed)
+		
+					div = document.createElement('div');
+					div.setAttribute('class', 'shopItem tooltip');																		//generates divs id, class and onclick functionality for an item in the shop
+					div.setAttribute('id', shop + 'Item' + (j+1) + ',' + (i+1));
+					div.setAttribute('onclick', 'buyItem(' + shop + ', ' + pos + ', ' + (j+1) + ', ' + (i+1) + ')');
+				
+					document.getElementById(shop).appendChild(div);
+					
+					div = document.createElement('span');
+					div.setAttribute('class', 'tooltiptext');
+					div.setAttribute('id', shop + 'tooltiptext' + (j+1) + ',' + (i+1));											//generate the tooltip div and add it to the item
+					
+					document.getElementById(shop + 'Item' + (j+1) + ',' + (i+1)).appendChild(div);
+					
+				}
+			
+				for (i = 0; i < 5; i++) {
+					
+					div = document.createElement('div');
+					div.setAttribute('class', 'shopPrice');
+					div.setAttribute('id', shop + 'Price' + (j+1) + ',' + (i+1));													//generates divs id, class and innerHTML for a price in the shop
+				
+					document.getElementById(shop).appendChild(div);
+				
+				}
+		
+				if (j == 0) {
+				
+					div = document.createElement('div');
+					div.setAttribute('id', 'bar');																								//the bar seperating the 2 rows
+					
+					document.getElementById(shop).appendChild(div);
+				
+				}
+			
+			}
+		
+			populateShop(shop);																												//calls the function to put items in the shop
+		
+		}
+		
+		function genItem() {					//generates an item and its stats
+		
+			var percentCleared = Math.floor((pointsCleared / pointNo) * 100);
+			var item = new Item();
+			var type = (Math.floor(Math.random() * 9) + 1);
+			
+			item.name = "";
+			item.consumable = false;
+			item.regen = 0;
+			item.health = 0;
+			item.attack = 0;
+			item.defense = 0;
+			item.charisma = 0;
+			item.intelligence = 0;
+			item.power = 0;
+			
+			switch(type) {
+				case 1:
+					item.type = "sword";																					//type of the item
+					item.attack = (Math.floor(Math.random() * 3) + 1);										//how much attack the item gives you
+					break;
+			
+				case 2:
+					item.type = "staff";
+					item.intelligence = (Math.floor(Math.random() * 3) + 1);
+					break;
+				
+				case 3:
+					item.type = "helmet";
+					item.defense = (Math.floor(Math.random() * 3) + 1);
+					break;dsf
+					
+				case 4:
+					item.type = "amulet";
+					item.attack = (Math.floor(Math.random() * 2) + 1);
+					item.charisma = (Math.floor(Math.random() * 5) + 1);
+					item.intelligence = (Math.floor(Math.random() * 2) + 1);
+					break;
+					
+				case 5:
+					item.type = "armour";
+					item.health = (Math.floor(Math.random() * 20) + 1);
+					item.defense = (Math.floor(Math.random() * 5) + 1);
+					break;
+					
+				case 6:
+					item.type = "leggings";
+					item.health = (Math.floor(Math.random() * 10) + 1);
+					item.defense =  (Math.floor(Math.random() * 4) + 1);
+					break;
+					
+				case 7:
+					item.type = "boots";
+					item.defense = (Math.floor(Math.random() * 3) + 1);
+					break;
+					
+				case 8:
+					item.type = "potion";
+					item.consumable = true;
+					item.regen = 20;
+					break;
+					
+				case 9: 
+					item.type = "food";
+					item.consumable = true;
+					item.regen = 10;
+			}
+		
+			item.power = item.regen + item.health + item.attack + item.defense + item.charisma + item.intelligence;			//basic algorithm for the power of the item
+			item.cost = 2 * item.power;																																			//basic algorithm for the cost of the item
+		
+			return item;
+		
+		}
+		
+		function hardCodeItem(type, power) {
+			var item = new Item();
+			item.type = type;
+			item.name = "";
+			item.consumable = false;
+			item.regen = 0;
+			item.health = 0;
+			item.attack = 0;
+			item.defense = 0;
+			item.charisma = 0;
+			item.intelligence = 0;
+			item.power = 0;
+			
+			switch(type) {
+				case 'sword':
+					item.attack = power;
+					break;
+			
+				case 'staff':
+					item.intelligence = power;
+					break;
+				
+				case 'helmet':
+					item.defense = power / 4;
+					break;
+					
+				case 'amulet':
+					item.attack = power / 3;
+					item.charisma = power / 2;
+					item.intelligence = power / 3;
+					break;
+					
+				case 'armour':
+					item.health = power;
+					item.defense =  power / 4;
+					break;
+					
+				case 'leggings':
+					item.health = power;
+					item.defense =  power / 4;
+					break;
+					
+				case 'boots':
+					item.defense = power / 4;
+					break;
+			}
+			return item;
+		}
+		
+		function genLoot() {
+			var scalar = pointsCleared / pointNo;
+			var item =  new Item;
+			
+			
+		}
+		
+		function populateShop(shop) {				//populates items to go in the shops
+		
+			var item;
+		
+			var output = "";
+			var x, y, z;
+		
+			for (i = 0; i < 2; i++) {
+			
+				for (j = 0; j < 5; j++) {																																																//repeates this code 10 times (one for each item)
+				
+					switch(shop) {
+						case 'merchant': 
+							do {
+								item = genItem();																																													//calls the function to generate an item
+							} while (item.type == "staff" || item.type == "helmet" || item.type == "armour" || item.type == "leggings" || item.type == "boots");		//repeates generating an item until its not one of these (restricts what items can be in the shop)
+							item.inShop = true;																																														//makes it so the 
+							merchantItems.push(item);																																											//adds it to the array of shop items to be able to access it later
+							break;
+						
+						case 'smithy':
+							do {
+								item = genItem();
+							} while (item.type == "staff" || item.type == "amulet" || item.type == "potion" || item.type == "food");													//same as previous section
+							item.inShop = true;
+							smithyItems.push(item);
+							break;
+						
+						case 'aMerchant':
+							do {
+								item = genItem();
+							} while (item.type == "sword" || item.type == "helmet" || item.type == "armour" || item.type == "leggings" || item.type == "boots" || item.type == "food");			//same as previous section
+							item.inShop = true;
+							aMerchantItems.push(item);
+							break;
+					
+					}
+					
+					for (x in item) {																																																	//for every property in 'item'
+						if (x != 'consumable' && x != 'cost' && x != 'inShop' && item[x] != "")																												//some properties i dont want to show in the shop tooltip, and if its not blank
+							output = output + x + ': ' + item[x] + '<br>';																																				//add the property and its value to the output variable
+					}
+					
+					document.getElementById(shop + 'tooltiptext' + (i+1) + ',' + (j+1)).innerHTML = output;																					//make the text of the tooltip the output var
+					
+					output = "";																																																			//resets the output
+					
+					x = shop + 'Item' + (i+1) + ',' + (j+1);																																									//sets x to a string (easier to keep track of debugging wise)
+					y = shop + 'Price' + (i+1) + ',' + (j+1);																																									//sets y to a string (easier to keep track of debugging wise)
+					z = 'url(' + item.type + '.png)';																																												//sets z to a string (easier to keep track of debugging wise)
+					
+					document.getElementById(x).style.backgroundImage = z;																																	//sets the backgroung image of the shopitem 
+					document.getElementById(y).innerHTML = item.cost + 'GP';																																//sets the text of the price div to the price
+				
+				}
+			
+			}
+		
+		}
+		
+		function buyItem(shop, pos, y, x) {			//buys an item from a shop (moves it from a shop inventory to the player inventory)
+		
+			document.getElementById('shopAnnouncement').style.display = 'block';																	//shows the announcement at the bottom of the div (starts off black until filled)
+			
+			var item = eval(shop.id + 'Items[' + pos + ']');																											//makes var item equal to the item being bought 
+			var price = item.cost;																																				//var cost equals the cost of the item
+			var sold = player.changeGold(price);
+			
+			if (sold && item != "") {																																			//if you can afford it and if the item isnt empty...
+			
+				player.inventory.push(item);																																	//put it in the players inventory
+
+				switch(shop.id) {
+					case 'merchant': merchantItems[pos] = "";
+						break;
+					case 'aMerchant': aMerchantItems[pos] = "";
+						break;
+					case 'smithy': smithyItems[pos] = "";
+						break;
+				}																																											//set the item in the shop to "" (no dynamic way of doing this afaik)
+
+				var parent = document.getElementById(shop.id + 'Item' + y + ',' + x);
+				var child = document.getElementById(shop.id + 'tooltiptext' + y + ',' + x);
+				
+				parent.removeChild(child);																																		//removes the tooltip
+				document.getElementById(shop.id + 'Item' + y + ',' + x).style.backgroundImage = 'url("sold.png")';														//changes the background of the item to be 'sold'
+				document.getElementById(shop.id + 'Price' + y + ',' + x).innerHTML = 'Sold out!';													//changes the price div to be 'Sold out!'
+				document.getElementById('shopAnnouncement').innerHTML = 'Item purchased';													//changes the announcement to be 'Item purchased '
+			
+			} else if (item == "") {																																				//else if its already been sold...
+				document.getElementById('shopAnnouncement').innerHTML = 'This item is sold out';												//tell the player
+			} else {																																									//if it hasnt been sold and you cant afford it...
+				document.getElementById('shopAnnouncement').innerHTML = 'You dont have the gold to purchase this';				//tell the player
+			}
+			
+			setTimeout(function() { document.getElementById('shopAnnouncement').innerHTML = ""; }, 2000);							//clears the announcement after 2 seconds
+			
+		}
+		
+		function popInv(item) {							//generates item thumbnails and tooltips for your inventory
+		
+			var x = 1;
+			var output = "";
+		
+			player.inventory.sort(compare);																																					//sorts the items in player inventory by power rating
+			
+			var list = document.getElementsByClassName(item + 'Inv');
+			length = list.length;
+			
+			for (var i = 0; i < length; i++, x++)	{
+				document.getElementById(item + 'Inv').removeChild(document.getElementById(item + 'InvNo' + x));
+			}																																																	//removes all the divs in the inventory as they will be reproduced later
+			
+			x = 1;
+			
+			for (var i = 0; i < player.inventory.length; i++) {																															//for each item in player inventory
+			
+				if ((player.inventory[i].type == item || ((item == 'weapon') && (player.inventory[i].type == 'sword' || player.inventory[i].type == 'staff')) || ((item == 'cons') && (player.inventory[i].type == 'potion' || player.inventory[i].type == 'food'))) || item == 'full') {
+																																																				//if item selected in loop is equal to the item type inventory being shown
+					var div = document.createElement('div');
+					div.setAttribute('class', 'invItem tooltip ' + item + 'Inv');
+					div.setAttribute('id', item + 'InvNo' + x); 
+					div.setAttribute('onclick', 'equipItem(' + i + ', ' + item +')')																									//gen the item thumbnail and put it in the inventory div
+					
+					document.getElementById(item + 'Inv').appendChild(div);
+					
+					document.getElementById(item + 'InvNo' + x).style.backgroundImage = 'url(' + player.inventory[i].type + '.png)';
+				
+					div = document.createElement('span');
+					div.setAttribute('class', 'tooltiptext');
+					div.setAttribute('id', item + 'tooltiptext' + x);																														//generate the tooltip div and add it to the item
+					
+					document.getElementById(item + 'InvNo' + x).appendChild(div);
+					
+					for (y in player.inventory[i]) {																																				//for every property in 'item'
+						if (y != 'consumable' && y != 'cost' && y != 'inShop' && player.inventory[i][y] != "")														//some properties i dont want to show in the shop tooltip, and if its not blank
+							output = output + y + ': ' + player.inventory[i][y] + '<br>';																							//add the property and its value to the output variable
+					}
+					
+					var z = item + 'tooltiptext' + x
+					document.getElementById(z).innerHTML = output;																												//make the text of the tooltip the output var
+					
+					output = "";
+				
+					x++;
+				
+				}
+			
+			}
+		
+		}
+		
+		function compare(x,y) {							//sorts items by power
+		
+			if (x.power < y.power)
+				return 1;
+			if (x.power > y.power)
+				return -1;
+			return 0;
+			
+		}
+		
+		function equipItem(pos, itemType) {		//equips and item from your inventory, and unequips the equipped item. if no item already equipped just equips clicked item. Or consumed consumable
+		
+			var consumed = true;
+		
+			for (i = 0; i < player.equipped.length; i++) {																//for each item equipped (will be 6)
+			
+				if (player.equipped[i].type == itemType.id || (itemType.id == "weapon" && (player.equipped[i].type == "staff" || player.equipped[i].type == "sword"))) {
+				
+					if (player.equipped[i].power > 0) player.inventory.push(player.equipped[i]);		//if the equipped item has power (if something is currently equipped), push it onto the players inv
+					player.equipped[i] = player.inventory[pos];														//overwrite the item being unequipped with the item being equipped
+					player.inventory.splice(pos, 1);																			//remove that item from your inventory
+					popInv(itemType.id);																							//update the inventory shown
+					player.updateStats();																							//update your stats
+					invItemHoverOut();
+					break;
+				
+				}
+				
+				if (player.inventory[pos].consumable) {
+		
+					var consumed = player.changeHealth(player.inventory[pos].regen)
+					if (!consumed) break;
+					player.inventory.splice(pos, 1);
+					if (inBattle) { 
+						nav.open('fight');
+						
+						document.getElementById('playerName').style.color = 'white';
+						document.getElementById('enemyName').style.color = 'yellow';
+						this.playerTurn = false;
+						setTimeout(function () { fight.enemyTurn(); }, 1000);
+					}
+					popInv('cons');
+					
+					break;
+					
+				}
+			
+			}
+		
+		}
+		
+		function fadeIn(elementId) {
+			var op = 0.1;
+			element = document.getElementById(elementId);
+			element.style.opacity = op;
+			element.style.display = 'block';
+			var timer = setInterval(function () {
+				if (op >= 1){
+					clearInterval(timer);
+				}
+				element.style.opacity = op;
+				element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+				op += op * 0.1;
+			}, 50);
+		}
+		
+		var interaction = {
+			'8': function() {
+				var sel = Math.floor(Math.random() *100) + 1;
+				var item = {};
+				if (sel < 10) {
+					item.type = 'sword';
+					item.name = "";
+					item.consumable = false;
+					item.regen = 0;
+					item.health = 0;
+					item.attack = 0;
+					item.defense = 0;																						
+					item.charisma = 0;
+					item.intelligence = 0;
+					item.power = 0;
+					player.equipped[5] = item; 
+					interactions.broke8.opt1Onclick = "nav.open('inventory')";
+					changeOut(100, 'broke8');
+				} else if (sel < 60) {
+					
+				} else if (sel < 90) {
+				
+				} else {
+				
+				}
+			}
+		}
+		
+		/* changes
+			
+		*/
+		
+	</script>
+	
+</html>
