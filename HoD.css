@@ -130,11 +130,6 @@ body {
 	#townIcon:hover {
 		background-image: url("townIcon-hover.png");
 	}
-
-	#lookupTest {
-		left: 10px;
-		top: 10px;
-	}
 	
 
 /*town*/
@@ -274,6 +269,11 @@ body {
 	#statsHoverContent {
 		width: 100%;
 		padding-left: 5px;
+	}
+	
+	.lootItem {
+		width: 300px;
+		height: 100px
 	}
 
 

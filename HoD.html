@@ -202,11 +202,19 @@
 			},
 			
 			updateStats: function() {
-				player.health.current = player.health.base + player.equipped[0].health + player.equipped[2].health + player.equipped[3].health + player.equipped[4].health;
-				player.attack.current = player.attack.base + player.equipped[1].attack + player.equipped[5].attack;
-				player.defense.current = player.defense.base + player.equipped[0].defense + player.equipped[2].defense + player.equipped[3].defense + player.equipped[4].defense;
-				player.charisma.current = player.charisma.base + player.equipped[1].charisma;
-				player.intelligence.current = player.intelligence.base + player.equipped[1].intelligence + player.equipped[5].intelligence;
+				player.health.bonus = player.equipped[0].health + player.equipped[2].health + player.equipped[3].health + player.equipped[4].health;
+				player.attack.bonus = player.equipped[1].attack + player.equipped[5].attack;
+				player.defense.bonus = player.equipped[0].defense + player.equipped[2].defense + player.equipped[3].defense + player.equipped[4].defense;
+				player.charisma.bonus = player.equipped[1].charisma;
+				player.intelligence.bonus = player.equipped[1].intelligence + player.equipped[5].intelligence;
+			
+				player.health.current = player.health.base + player.health.bonus;
+				player.attack.current = player.attack.base + player.attack.bonus;
+				player.defense.current = player.defense.base + player.defense.bonus;
+				player.charisma.current = player.charisma.base + player.charisma.bonus;
+				player.intelligence.current = player.intelligence.base + player.intelligence.bonus;
+				
+				this.changeHealth(0);
 			},
 			
 			changeStat: function(stat, amount) {
@@ -889,11 +897,16 @@
 		
 		}
 		
-		function genItem() {					//generates an item and its stats
+		function genItem(inShop, type) {			//generates an item and its stats
 		
-			var percentCleared = Math.floor((pointsCleared / pointNo) * 100);
+			var scalar = pointsCleared / pointNo;
+			scalar = (scalar < 0.2) ? 0.2 : scalar;
+			scalar = (inShop) ? scalar - 0.1 : scalar;
 			var item = new Item();
-			var type = (Math.floor(Math.random() * 9) + 1);
+			if (typeof type === "undefined") var type = (Math.floor(Math.random() * 9) + 1);
+			var power = 100 * scalar;
+			var varient = Math.floor(Math.random() * (power * 0.2));
+			if (Math.random() >= 0.5) varient = varient * -1;
 			
 			item.name = "";
 			item.consumable = false;
@@ -907,117 +920,71 @@
 			
 			switch(type) {
 				case 1:
-					item.type = "sword";																					//type of the item
-					item.attack = (Math.floor(Math.random() * 3) + 1);										//how much attack the item gives you
+					item.type = "sword";
+					item.attack = Math.floor(power) + varient;
 					break;
-			
 				case 2:
 					item.type = "staff";
-					item.intelligence = (Math.floor(Math.random() * 3) + 1);
+					item.intelligence = power;
 					break;
-				
 				case 3:
 					item.type = "helmet";
-					item.defense = (Math.floor(Math.random() * 3) + 1);
-					break;dsf
-					
+					item.defense = Math.floor(power / 4) + varient;
+					break;
 				case 4:
 					item.type = "amulet";
-					item.attack = (Math.floor(Math.random() * 2) + 1);
-					item.charisma = (Math.floor(Math.random() * 5) + 1);
-					item.intelligence = (Math.floor(Math.random() * 2) + 1);
+					item.attack = Math.floor(power / 3) + varient;
+					item.charisma = Math.floor(power / 2) + varient;
+					item.intelligence = Math.floor(power / 3) + varient;
 					break;
-					
 				case 5:
 					item.type = "armour";
-					item.health = (Math.floor(Math.random() * 20) + 1);
-					item.defense = (Math.floor(Math.random() * 5) + 1);
+					item.health = Math.floor(power * 3.5) + varient;
+					item.defense = Math.floor(power / 3) + varient;
 					break;
-					
 				case 6:
 					item.type = "leggings";
-					item.health = (Math.floor(Math.random() * 10) + 1);
-					item.defense =  (Math.floor(Math.random() * 4) + 1);
+					item.health = Math.floor(power * 2.5) + varient;
+					item.defense =  Math.floor(power / 4) + varient;
 					break;
-					
 				case 7:
 					item.type = "boots";
-					item.defense = (Math.floor(Math.random() * 3) + 1);
+					item.defense = Math.floor(power / 4) + varient;
 					break;
-					
 				case 8:
 					item.type = "potion";
 					item.consumable = true;
 					item.regen = 20;
 					break;
-					
 				case 9: 
 					item.type = "food";
 					item.consumable = true;
 					item.regen = 10;
 			}
 		
-			item.power = item.regen + item.health + item.attack + item.defense + item.charisma + item.intelligence;			//basic algorithm for the power of the item
-			item.cost = 2 * item.power;																																			//basic algorithm for the cost of the item
+			item.power = power;
+			item.cost = (type < 8) ? (2 * power) + varient : 2 * power;
 		
 			return item;
 		
-		}
-		
-		function hardCodeItem(type, power) {
-			var item = new Item();
-			item.type = type;
-			item.name = "";
-			item.consumable = false;
-			item.regen = 0;
-			item.health = 0;
-			item.attack = 0;
-			item.defense = 0;
-			item.charisma = 0;
-			item.intelligence = 0;
-			item.power = 0;
-			
-			switch(type) {
-				case 'sword':
-					item.attack = power;
-					break;
-			
-				case 'staff':
-					item.intelligence = power;
-					break;
-				
-				case 'helmet':
-					item.defense = power / 4;
-					break;
-					
-				case 'amulet':
-					item.attack = power / 3;
-					item.charisma = power / 2;
-					item.intelligence = power / 3;
-					break;
-					
-				case 'armour':
-					item.health = power;
-					item.defense =  power / 4;
-					break;
-					
-				case 'leggings':
-					item.health = power;
-					item.defense =  power / 4;
-					break;
-					
-				case 'boots':
-					item.defense = power / 4;
-					break;
-			}
-			return item;
 		}
 		
 		function genLoot() {
-			var scalar = pointsCleared / pointNo;
-			var item =  new Item;
-			
-			
+			var itemNo = Math.floor(Math.random() * 3) + 1;
+			var items = [];
+		
+			for (i = 0; i < itemNo; i++) {
+				do {
+					items[i] = genItem(false);
+				} while (items[i].consumable === false);
+				var div = document.createElement('div');
+				div.setAttribute('class', 'lootItem');
+				div.setAttribute('id', 'lootItem' + i);
+				div.setAttribute('onclick', function() {
+					player.inventory.push(items[i]);
+					victoryScreen.removeChild('lootItem' + i);
+				})
+			}				//do css
 		}
 		
 		function populateShop(shop) {				//populates items to go in the shops
@@ -1034,7 +1001,7 @@
 					switch(shop) {
 						case 'merchant': 
 							do {
-								item = genItem();																																													//calls the function to generate an item
+								item = genItem(true);																																													//calls the function to generate an item
 							} while (item.type == "staff" || item.type == "helmet" || item.type == "armour" || item.type == "leggings" || item.type == "boots");		//repeates generating an item until its not one of these (restricts what items can be in the shop)
 							item.inShop = true;																																														//makes it so the 
 							merchantItems.push(item);																																											//adds it to the array of shop items to be able to access it later
@@ -1042,7 +1009,7 @@
 						
 						case 'smithy':
 							do {
-								item = genItem();
+								item = genItem(true);
 							} while (item.type == "staff" || item.type == "amulet" || item.type == "potion" || item.type == "food");													//same as previous section
 							item.inShop = true;
 							smithyItems.push(item);
@@ -1050,7 +1017,7 @@
 						
 						case 'aMerchant':
 							do {
-								item = genItem();
+								item = genItem(true);
 							} while (item.type == "sword" || item.type == "helmet" || item.type == "armour" || item.type == "leggings" || item.type == "boots" || item.type == "food");			//same as previous section
 							item.inShop = true;
 							aMerchantItems.push(item);
@@ -1142,7 +1109,7 @@
 					var div = document.createElement('div');
 					div.setAttribute('class', 'invItem tooltip ' + item + 'Inv');
 					div.setAttribute('id', item + 'InvNo' + x); 
-					div.setAttribute('onclick', 'equipItem(' + i + ', ' + item +')')																									//gen the item thumbnail and put it in the inventory div
+					if (item !== "full") div.setAttribute('onclick', 'equipItem(' + i + ', ' + item +')');																		//gen the item thumbnail and put it in the inventory div
 					
 					document.getElementById(item + 'Inv').appendChild(div);
 					
@@ -1267,7 +1234,8 @@
 		}
 		
 		/* changes
-			
+			Redone item generation
+			Fixed bug regarding health not being updated on item equip
 		*/
 		
 	</script>
