@@ -94,7 +94,10 @@
 			
 			<div class = "outputDiv interaction" id = "defeat">You lost</div>
 	
-			<div class = "outputDiv interaction" id = "loot">loot</div>
+			<div class = "outputDiv interaction" id = "loot">
+				<div id = "lootMessage">Collect your loot!</div>
+				
+			</div>
 		
 		</div>
 		
@@ -483,8 +486,8 @@
 			mapArray[1][30] = 't';
 			
 			div = document.createElement('div');
-			div.setAttribute('id', 'townIcon');
-			div.setAttribute('class', 'iconCoord');
+			div.id = 'townIcon';
+			div.className = 'iconCoord';
 			div.setAttribute('onclick', 'nav.open("town")');														//creates the icon for a town (special exception hence the hardcoding)
 			
 			document.getElementById('map').appendChild(div);
@@ -510,8 +513,8 @@
 				
 					var divID = 'openingScr' + interactionNo;
 					div = document.createElement('div');																//puts a div in a variable called 'div', currently has no attributes or properties
-					div.setAttribute('class', 'iconCoord');																//sets the class to 'mapCoord'
-					div.setAttribute('id', 'coord' + (y) + ',' + (x));													//sets the id to 'coord' then the x and y coordinate
+					div.className = 'iconCoord';																			//sets the class to 'mapCoord'
+					div.id = 'coord' + (y) + ',' + (x);																		//sets the id to 'coord' then the x and y coordinate
 					div.setAttribute('onclick', 'nav.open("output"), ' 
 													+ 'changeOut(100, "openingScr' + interactionNo + '")');	//gives the div an onclick function to close the map and open the interaction (wip)
 					div.style.left = ((x * 20) - 10) + 'px';																//positions the new div along the x axis
@@ -970,21 +973,42 @@
 		}
 		
 		function genLoot() {
-			var itemNo = Math.floor(Math.random() * 3) + 1;
+			var itemNoSel = Math.random();
+			var itemNo;
+			var output = "";
 			var items = [];
 		
+			if (itemNoSel < 0.6) itemNo = 1
+			else if (itemNoSel < 0.9) itemNo = 2;
+			//else 
+			itemNo = 3;
+		
+			nav.open('loot');
+		
 			for (i = 0; i < itemNo; i++) {
+				output = "";
 				do {
 					items[i] = genItem(false);
-				} while (items[i].consumable === false);
+				} while (items[i].consumable === true);
 				var div = document.createElement('div');
-				div.setAttribute('class', 'lootItem');
-				div.setAttribute('id', 'lootItem' + i);
-				div.setAttribute('onclick', function() {
-					player.inventory.push(items[i]);
-					victoryScreen.removeChild('lootItem' + i);
-				})
-			}				//do css
+				div.className = 'lootItem';
+				div.id = 'lootItem' + i;
+				div.setAttribute('itemId', i);
+				div.style.backgroundImage = "url(" + items[i].type + ".png)"
+				for (y in items[i]) {
+					if (y != 'consumable' && y != 'cost' && y != 'inShop' && items[i][y] != "")
+						output = output + y + ': ' + items[i][y] + '<br>';	
+				}
+				
+				div.onclick = function(evt) {
+					var itemId = parseInt(evt.target.getAttribute('itemId'));
+					player.inventory.push(items[itemId]);
+					document.getElementById('loot').removeChild(this);
+				}
+				div.style.top = (i+1) * 120 + "px";
+				document.getElementById('loot').appendChild(div);
+				document.getElementById('lootItem' + i).innerHTML = output;
+			}
 		}
 		
 		function populateShop(shop) {				//populates items to go in the shops
@@ -1234,10 +1258,9 @@
 		}
 		
 		/* changes
-			Redone item generation
-			Fixed bug regarding health not being updated on item equip
+			carrying on with genLoot()
 		*/
-		
+		// enumerated string
 	</script>
 	
 </html>
