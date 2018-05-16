@@ -272,24 +272,24 @@ body {
 	}
 	
 	.lootItem {
-		width: 200px;
-		height: 100px;
-		border: 5px solid white;
-		margin-bottom: 10px;
-		border-radius: 5px;
 		background-position: left;
 		background-repeat: no-repeat;
-		padding-left: 100px;
+		width: 190px;
+		height: 100px;
+		border: 5px solid white;
+		border-radius: 5px;
 		margin-left: 150px;
+		margin-bottom: 10px;
+		padding-left: 100px;
 		text-transform: capitalize;
 	}
-
-	#loot {
-		overflow-y: scroll;
-	}
 	
-	#loot::-webkit-scrollbar {
-		display:none;
+	.lootItem:hover {
+		border-color: yellow;
+	}
+
+	#lootItem3 {
+		margin-bottom: 0px;
 	}
 	
 	#lootMessage {
@@ -297,7 +297,39 @@ body {
 		margin-bottom: 10px;
 		font-size: 2em;
 		text-align: center;
-    
+	}
+	
+	#lootCont {
+		background-color: white;
+		width: 50px;
+		height: 20px;
+		position: absolute;
+		top: 190px;
+		right: 50px;
+	}
+	
+	#lootCont:hover {
+		background-color: yellow;
+	}
+	
+	#victoryMessage1 {
+		width: 100%;
+		position: absolute;
+		top: 150px;
+		text-align: center;
+		font-size: 3em;
+	}
+	
+	#victoryMessage2 {
+	    width: 100%;
+		position: absolute;
+		top: 210px;
+		text-align: center;
+		font-size: 1.5em;
+	}
+	
+	#victoryMessage2:hover {
+		color: yellow;
 	}
 
 
