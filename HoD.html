@@ -9,7 +9,7 @@
 
 <div id="mapThumbnail" onclick="nav.open('map')"></div>
 <div id="invThumbnail" onclick="nav.open('inventory')"></div>
-<div id="gold">26 gold</div>
+<div id="gold"></div>
 <div id="healthBarBG">
     <div id="healthBar"></div>
 </div>
@@ -125,7 +125,7 @@
 <script src="objLookupTest.js"></script>
 <script>
 
-    var mapArray = [];
+    var mapObj = {};
     var merchantItems = [];
     var aMerchantItems = [];
     var smithyItems = [];
@@ -196,7 +196,6 @@
                         item.type = "sword";
                         break;
                 }
-                item.name = "";
                 item.consumable = false;
                 item.regen = 0;
                 item.health = 0;
@@ -266,36 +265,41 @@
     };
 
     var nav = {
-
         prevOpenDiv: "",
 
-        open: function (ID) {
-
+        open: function (ID, compID) {
             var list = document.getElementsByClassName('outputDiv');
             var num = list.length;
+            var interactionID;
 
+            if (ID.includes('output')) {
+                interactionID = parseInt(ID.slice(ID.length - 1)) + 1;
+                if (mapObj[interactionID].complete) {
+                    return;
+                }
+                ID = ID.slice(0, ID.length-1);
+                changeOut(100, 'openingScr' + interactionID);
+            }
             for (var i = 0; i < num; i++) {
-
                 if (list[i].style.display == 'block') {
-
                     if (list[i].classList.contains('interaction') && (ID == 'inventory') && (list[i].id != 'openingMenuScr2')) {
                         return 0;
                     }
                     list[i].style.display = 'none';
                     prevOpenDiv = list[i];
-
                 }
-
+            }
+            if (typeof compID != "undefined") {
+                pointsCleared++;
+                mapObj[compID].complete = true;
             }
 
             document.getElementById('shopAnnouncement').style.display = 'none';
             document.getElementById('backButton').style.display = 'none';
             document.getElementById(ID).style.display = 'block';
-
         },
 
         back: function () {
-
             var list = document.getElementsByClassName('outputDiv');
             var num = list.length;
 
@@ -306,17 +310,17 @@
             prevOpenDiv.style.display = 'block';
             document.getElementById('backButton').style.display = 'none';
             document.getElementById('shopAnnouncement').style.display = 'none';
-
         }
-
     };
 
     var fight = {
 
         playerTurn: true,
         enemy: null,
+        interactionNo: null,
 
-        setUpFight: function (enemyType) {
+        setUpFight: function (enemyType, interaction) {
+            this.interactionNo = interaction;
             nav.open('fight');
             this.enemy = this.genEnemy(enemyType);
             inBattle = true;
@@ -398,7 +402,7 @@
                 this.attack(false)
             }
             else if (this.enemy.intention == 'block') {
-                this.enemy.defense++;
+                this.enemy.defense = (Math.floor(this.enemy.defense * 1.1) == this.enemy.defense) ? (this.enemy.defense + 1) : (this.enemy.defense * 1.1);
                 this.outputStats();
             }
             this.playerTurn = true;
@@ -431,12 +435,14 @@
 
         genEnemy: function (type) {
             var enemy = new Enemy;
-            var percentCleard = Math.floor((pointsCleared / pointNo) * 100);
+            var scalar = (pointsCleared / pointNo);
+            scalar = (scalar < 0.2) ? 0.2 : scalar;
+            var power = 100 * scalar;
 
             enemy.name = type;
-            enemy.attack = Math.floor(Math.random() * 3) + 6;
-            enemy.defense = Math.floor(Math.random() * 2) + 3;
-            enemy.health = Math.floor(Math.random() * 20) + 30;
+            enemy.attack = Math.floor(((Math.random() * 15) + 30) * scalar);
+            enemy.defense = Math.floor(((Math.random() * 10) + 15) * scalar);
+            enemy.health = Math.floor(((Math.random() * 100) + 150) * scalar);
             enemy.intention = 'attack';
             enemy.hp = enemy.health;
             return enemy;
@@ -445,6 +451,7 @@
         victory: function () {
             document.getElementById('enemyHealthBarBG').style.display = 'none';
             document.getElementById('enemyHealthLabel').style.display = 'none';
+            mapObj[this.interactionNo].complete = true;
             nav.open('victoryScreen');
             inBattle = false;
         }
@@ -461,7 +468,7 @@
         this.charisma = charisma;
         this.intelligence = intelligence;
         this.power = power;
-        this.cost = cost;																										//creates an object template for an item that can be reused
+        this.cost = cost;
     }
 
     function Enemy(name, health, hp, intention, attack, defense) {
@@ -487,8 +494,7 @@
         document.getElementById('statsHoverName').innerHTML = item.type;
 
         for (var x in item) {
-            if (x != 'consumable' && x != 'cost' && x != 'inShop' && x != 'type' && item[x] != "")
-            {
+            if (x != 'consumable' && x != 'cost' && x != 'inShop' && x != 'type' && item[x] != "") {
                 output += x + ': ' + item[x] + '<br>';
             }
         }
@@ -511,47 +517,43 @@
         var div;
 
         //pointNo = Math.floor((Math.random() * 5) + 15);
-        pointNo = 7;
+        pointNo = 8;
 
-        for (var i = 0; i < 20; i++) {
-            mapArray[i + 1] = [];
-            for (var j = 0; j < 30; j++) {
-                mapArray[i + 1][j + 1] = '';
-            }
-
-        }
-
-        mapArray[1][30] = 't';
+        mapObj.town = {};
+        mapObj.town.X = 30;
+        mapObj.town.Y = 1;
 
         div = document.createElement('div');
         div.id = 'townIcon';
         div.className = 'iconCoord';
         div.setAttribute('onclick', 'nav.open("town")');
-
         document.getElementById('map').appendChild(div);
 
         genTown();
 
         for (var k = 0; k < pointNo; k++) {
-
             pointCoord = Math.floor(Math.random() * 600);
-
-            y = parseInt(pointCoord / 30) + 1;
+            y = Math.floor(pointCoord / 30) + 1;
             x = ((pointCoord % 30) + 1);
 
-            if (mapArray[y][x] == '') {
+            for (var key in mapObj) {
+                if (mapObj[key].X != x || mapObj[key].Y != y) {
+                    div = document.createElement('div');
+                    div.className = 'iconCoord';
+                    div.id = 'coord' + (y) + ',' + (x);
+                    div.setAttribute('onclick', 'nav.open("output' + k + '")/*, changeOut(100, "openingScr' + (k + 1) + '")*/');
+                    div.style.left = ((x * 20) - 10) + 'px';
+                    div.style.top = ((y * 20) - 10) + 'px';
+                    document.getElementById('map').appendChild(div);
 
-                div = document.createElement('div');
-                div.className = 'iconCoord';
-                div.id = 'coord' + (y) + ',' + (x);
-                div.setAttribute('onclick', 'nav.open("output"), changeOut(100, "openingScr' + k + '")');
-                div.style.left = ((x * 20) - 10) + 'px';
-                div.style.top = ((y * 20) - 10) + 'px';
-                document.getElementById('map').appendChild(div);
-
-                mapArray[y][x] = 'o';
-            } else {
-                k--;
+                    mapObj[k + 1] = {};
+                    mapObj[k + 1].X = x;
+                    mapObj[k + 1].Y = y;
+                    mapObj[k + 1].complete = false;
+                } else {
+                    k--;
+                    break;
+                }
             }
         }
     }
@@ -956,7 +958,6 @@
     }
 
     function genItem(inShop, type) {
-
         var scalar = pointsCleared / pointNo;
         scalar = (scalar < 0.2) ? 0.2 : scalar;
         scalar = (inShop) ? scalar - 0.1 : scalar;
@@ -986,7 +987,7 @@
                 break;
             case 2:
                 item.type = "staff";
-                item.intelligence = power;
+                item.intelligence = Math.floor(power + variant);
                 break;
             case 3:
                 item.type = "helmet";
@@ -1101,8 +1102,7 @@
                 }
 
                 for (var x in item) {
-                    if (x != 'consumable' && x != 'cost' && x != 'inShop' && item[x] != "")
-                    {
+                    if (x != 'consumable' && x != 'cost' && x != 'inShop' && item[x] != "") {
                         output = output + x + ': ' + item[x] + '<br>';
                     }
                 }
@@ -1170,7 +1170,7 @@
                     || ((item == 'cons') && (player.inventory[i].type == 'potion' || player.inventory[i].type == 'food'))) || item == 'full') {
                 var div = document.createElement('div');
                 div.className = 'invItem tooltip ' + item + 'Inv';
-                div.id = 'id', item + 'InvNo' + x;
+                div.id = item + 'InvNo' + x;
                 if (item !== "full") {
                     div.setAttribute('onclick', 'equipItem(' + i + ', ' + item + ')');
                 }
@@ -1179,13 +1179,12 @@
                 document.getElementById(item + 'InvNo' + x).style.backgroundImage = 'url(' + player.inventory[i].type + '.png)';
 
                 div = document.createElement('span');
-                div.setAttribute('class', 'tooltiptext');
-                div.setAttribute('id', item + 'tooltiptext' + x);
+                div.className = 'tooltiptext';
+                div.id = item + 'tooltiptext' + x;
                 document.getElementById(item + 'InvNo' + x).appendChild(div);
 
                 for (var y in player.inventory[i]) {
-                    if (y != 'consumable' && y != 'cost' && y != 'inShop' && player.inventory[i][y] != "")
-                    {
+                    if (y != 'consumable' && y != 'cost' && y != 'inShop' && player.inventory[i][y] != "") {
                         output = output + y + ': ' + player.inventory[i][y] + '<br>';
                     }
                 }
@@ -1257,12 +1256,20 @@
     }
 
     var interaction = {
-        '8': function () {
+        no8: function () {
             var sel = Math.random();
             var item = {};
-            if (sel < 0.1) {
+            var prevAtck;
+            var sword = true;
+            if (player.equipped[5].type == 'sword') {
                 item.type = 'sword';
-                item.name = "";
+                prevAtck = player.equipped[5].attack;
+            } else {
+                item.type = 'staff';
+                sword = false;
+                prevAtck = player.equipped[5].intelligence;
+            }
+            if (sel < 0.1) {
                 item.consumable = false;
                 item.regen = 0;
                 item.health = 0;
@@ -1273,19 +1280,37 @@
                 item.power = 0;
                 player.equipped[5] = item;
                 interactions.broke8.opt1Onclick = "nav.open('inventory')";
+                nav.open('broke8');
                 changeOut(100, 'broke8');
             } else if (sel < 0.6) {
-
+                item = genItem(false, item.type);
+                if (sword) { item.attack = prevAtck * 0.8 }
+                else item.intelligence = prevAtck * 0.8;
+                interactions.bad8.opt1Onclick = "nav.open('inventory')";
+                nav.open('bad8');
             } else if (sel < 0.9) {
-
+                item = genItem(false, item.type);
+                if (sword) { item.attack = prevAtck * 1.2 }
+                else item.intelligence = prevAtck * 1.2;
+                interactions.good8.opt1Onclick = "nav.open('inventory')";
+                nav.open('good8');
             } else {
-
+                item = genItem(false, item.type);
+                if (sword) { item.attack = prevAtck * 1.5 }
+                else item.intelligence = prevAtck * 1.5;
+                interactions.great8.opt1Onclick = "nav.open('inventory')";
+                nav.open('great8');
             }
         }
     };
 
     /** CHANGES
-     * finished genLoot()
+     * Stop completed points being opened
+     * Moved one of the onclick functions for map -> nav.open()
+     */
+
+    /** HELP
+     * Calling interaction.8 from another object?!?!?!?!
      */
 
     /**PLANS
