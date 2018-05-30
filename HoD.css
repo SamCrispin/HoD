@@ -177,41 +177,41 @@ body {
 	}
 	
 	#weapon {
-		background-image: url('sword.png');
+		background-image: url("img/sword.png");
 		left: 415px;
 	}
 
 	#amulet {
-		background-image: url('amulet.png');
+		background-image: url("img/amulet.png");
 		left: 515px;
 	}
 
 	#helmet {
-		background-image: url('helmet.png');
+		background-image: url("img/helmet.png");
 		left: 415px;
 		top: 110px;
 	}
 
 	#armour {
-		background-image: url('armour.png');
+		background-image: url("img/armour.png");
 		left: 515px;
 		top: 110px;
 	}
 
 	#leggings {
-		background-image: url('leggings.png');
+		background-image: url("img/leggings.png");
 		left: 415px;
 		top: 210px;
 	}
 
 	#boots {
-		background-image: url('boots.png');
+		background-image: url("img/boots.png");
 		left: 515px;
 		top: 210px;
 	}
 	
 	#cons {
-		background-image: url('food.png');
+		background-image: url("img/food.png");
 		width: 150px;
 		left: 250px;
 		top: 210px;
