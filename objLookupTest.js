@@ -1,12 +1,12 @@
 var interactions = {
 	'startingMenu': {						//Starting menus
-		out: "Your name is Evandar Hrothgar. Your grandfather, a once decorated Warlord, brought dishonour to your family's name by desserting the scene of a great battle between your homeland of Demaxius and the Dark Elves of the south beyond the Dead Plains. 2 generations later, "
+		out: "Your name is Evandar Hrothgar. Your grandfather, a once decorated Warlord, brought dishonour to your family's name by deserting the scene of a great battle between your homeland of Demaxius and the Dark Elves of the south beyond the Dead Plains. 2 generations later, "
 		+ "you wish to bring back honour to your family by recovering a powerful relic lost during the Great War. You have heard rumours of it being among the abandoned mines of the southern elves and decided to start there.",
 		opt1: "1.	Continue",
 		opt1Onclick: "changeOut(100, 'startingMenu2')",
 	},
 	'startingMenu2': {
-		out: "After making the treacherous journey across the Dead Plains, the only things left in your possesion are your trusty oak staff, a few gold pieces left over from your time in Demaxius and the now rusty broadsword passed down from your grandfather. You arrive in the town of Elaris and "
+		out: "After making the treacherous journey across the Dead Plains, the only things left in your possession are your trusty oak staff, a few gold pieces left over from your time in Demaxius and the now rusty broadsword passed down from your grandfather. You arrive in the town of Elaris and "
 		+ "after finding an innkeeper generous enough to offer you a room for the night in exchange for he little gold you have, you awake ready to explore!",
 		opt1: "1.	Continue",
 		opt1Onclick: "nav.open('inventory')",
@@ -40,12 +40,6 @@ var interactions = {
 		opt1: "1.	You curse your own stupidity and draw your sword to fight back",
 		opt1Onclick: "fight.setUpFight('Giant Spider', 2)",
 	},
-	'spotted2': {
-		out: "You hear the spider pass you and take a peek out of one eye to have a look. The oversized arachnid is still heading off in the wrong direction. You wait a while to make sure it doesn't return and then start walking back to the entrance of the cave."
-		+ " You notice some less fortunate adventurers rotting on the floor, you hold your nose and rummage around for some loot before scurrying away.",
-		opt1: "1.	Continue",
-		opt1Onclick: "nav.open('loot', 2)",
-	},
 	'pass2': {
 		out: "You hear the spider pass you and take a peek out of one eye to have a look. The oversized arachnid is still heading off in the wrong direction. You wait a while to make sure it doesn't return and then start walking back to the entrance of the cave."
 		+ " You notice some less fortunate adventurers rotting on the floor, you hold your nose and rummage around for some loot before scurrying away.",
@@ -61,7 +55,7 @@ var interactions = {
 		opt2Onclick: "changeOut(100, 'fight3')",
 	},
 	'fight3': {
-		out: "You draw your sword and walk towards him, the man quickly gets the message and gets up, readying his own weapon, \"Big misteak boyo\".",
+		out: "You draw your sword and walk towards him, the man quickly gets the message and gets up, readying his own weapon, \"Big mistake boyo\".",
 		opt1: "1.	Fight",
 		opt1Onclick: "fight.setUpFight('Odd Man', 3)",
 	},
@@ -121,7 +115,7 @@ var interactions = {
 	},
 	'midgeMan6': {
 		out: "You round the corner to see a man, no more than 3 and a half feet in height, practising his swordsmanship with a sword clearly made for someone larger than him. Letting off high pitch grunts of exertion with every stroke which is the noise you mistook for a struggle."
-		+ " He's so ingrossed in his activity that it seems he hasn't noticed you yet...",
+		+ " He's so engrossed in his activity that it seems he hasn't noticed you yet...",
 		opt1: "1.	You're impressed by his swordsmanship, compliment him on it",
 		opt1Onclick: "changeOut(100, 'compliment6')",
 		opt2: "2.	You decide to leave the tiny man be, he looked no mug with a sword",
@@ -163,7 +157,7 @@ var interactions = {
 		opt1Onclick: "changeOut(100, 'duck8')"
 	},
 	'duck8': {
-		out: "You barely manage to duck out of the way of the projectile before it embeded itself in a tree behind you. You walk over to it and realise it's another weapon. Putting 2 hands on it you try and pull it out of the tree.",
+		out: "You barely manage to duck out of the way of the projectile before it embedded itself in a tree behind you. You walk over to it and realise it's another weapon. Putting 2 hands on it you try and pull it out of the tree.",
 		opt1: "1.	Pull!",
 		opt1Onclick: "interaction.no8",
 	},
@@ -173,17 +167,17 @@ var interactions = {
 		opt1Onclick: "nav.open('map')",
 	},
 	'broke8': {
-		out: "You give the weapon a mighty tug and you fall backwards as it comes loose from the tree. Feeling triumphant, you look at your newly aquired equipment just to realise that half of it is still stuck in the tree. It hadn't come loose. It had broke. You hear the laughing and sniggering "
+		out: "You give the weapon a mighty tug and you fall backwards as it comes loose from the tree. Feeling triumphant, you look at your newly acquired equipment just to realise that half of it is still stuck in the tree. It hadn't come loose. It had broke. You hear the laughing and sniggering "
 		+ "of the fire spirits behind you and angrily walk away cursing under your breath.",
 		opt1: "1.	Just ignore them... I suppose I need a new weapon now",
 	},
 	'bad8': {
-		out: "The weapong dislodges and you stumble back, you admire the craftsmanship of the piece and quickly realise that it's no where near as good as the one you sacrificed. Dissapointed, you look back at the spirits to see that they've already lost interest and are back to staring at "
+		out: "The weapong dislodges and you stumble back, you admire the craftsmanship of the piece and quickly realise that it's no where near as good as the one you sacrificed. Disappointed, you look back at the spirits to see that they've already lost interest and are back to staring at "
 		+ "the fire and waiting for the next person to come along.",
 		opt1: "1.	Well, it could have been worse...",
 	},
 	'good8': {
-		out: "It comes loose easier than you expected, you look at the fires creation and, much to your suprise, the new weapon seems a significant improvement to the one you threw in. Pleased with the outcome of this strange encounter, you look back to the onlooking spirits which are "
+		out: "It comes loose easier than you expected, you look at the fires creation and, much to your surprise, the new weapon seems a significant improvement to the one you threw in. Pleased with the outcome of this strange encounter, you look back to the onlooking spirits which are "
 		+ "clearly also pleased with the outcome as they are dancing round the fire cheering. Very confused at the whole situation, you head off with your new weapon in hand.",
 		opt1: "1.	Well then, onwards... I guess"
 	},
@@ -213,14 +207,14 @@ var interactions = {
 		opt1Onclick: "changeOut(50, 'trap9', 'notTrap9')"
 	},
 	'trap9': {
-		out: "The child starts beaming with a meanacingly evil smile. \"Good work laddie\", you hear a gruff voice behind you say. You turn to a man, quite a bit taller than you, staring at you with an " +
+		out: "The child starts beaming with a menacingly evil smile. \"Good work laddie\", you hear a gruff voice behind you say. You turn to a man, quite a bit taller than you, staring at you with an " +
 		"extremely disturbing grin from ear to ear and a sword in each hand start running towards you. You draw your sword and prepare for a fight",
 		opt1: "1.	Well you don't look injured, or like a mother for that matter",
 		opt1Onclick: "fight.setUpFight('Dual Wielding Bandit', 9)"
 	},
 	'notTrap9': {
 		out: "\"Just round here, hurry!\", you catch up to him to see his mother resting on the floor with a nasty gash in her stomach. You you remember you're grand father telling you about a wound not" +
-		"too disimilar to this one from his time in the war. You spend some time tending to her wound as best you can.",
+		"too dissimilar to this one from his time in the war. You spend some time tending to her wound as best you can.",
 		opt1: "1.	Continue",
 		opt1Onclick: "changeOut(100, 'helping9')"
 	},
