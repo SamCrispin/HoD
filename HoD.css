@@ -267,7 +267,15 @@ body {
 		width: 100%;
 		padding-left: 5px;
 	}
-	
+
+	#loot {
+		overflow-y: hidden;
+	}
+
+   #loot::-webkit-scrollbar {
+      display:none;
+   }
+
 	.lootItem {
 		background: no-repeat left;
 		width: 190px;
@@ -307,26 +315,31 @@ body {
 	#lootCont:hover {
 		background-color: yellow;
 	}
-	
-	#victoryMessage1 {
-		width: 100%;
-		position: absolute;
-		top: 150px;
-		text-align: center;
-		font-size: 3em;
-	}
-	
-	#victoryMessage2 {
-	    width: 100%;
-		position: absolute;
-		top: 210px;
-		text-align: center;
-		font-size: 1.5em;
-	}
-	
-	#victoryMessage2:hover {
-		color: yellow;
-	}
+
+   .message1 {
+      width: 100%;
+      position: absolute;
+      top: 150px;
+      text-align: center;
+      font-size: 3em;
+   }
+
+   .message2 {
+      width: 100%;
+      position: absolute;
+      top: 210px;
+      text-align: center;
+      font-size: 1.5em;
+   }
+
+   .message2:hover {
+      color: yellow;
+   }
+
+   /*#quit {
+      top: 240px;
+      font-size: 1.3em;
+   }*/
 
 
 /*shop*/
@@ -363,7 +376,7 @@ body {
 		height: 20px;
 		margin-bottom: 5px;
 	}
-	
+
 	#backButton {
 		background-color: white;
 		width: 50px;
@@ -373,6 +386,18 @@ body {
 	}
 
 	#backButton:hover {
+		background-color: yellow;
+	}
+
+	#doneButton {
+		background-color: white;
+		width: 50px;
+		height: 20px;
+		margin: auto;
+		display: none;
+	}
+
+	#doneButton:hover {
 		background-color: yellow;
 	}
 	
@@ -532,3 +557,10 @@ body {
 		text-align: center;
 		display: none;
 	}
+
+/*loss*/
+   #defeatMessage1 {
+      top: 150px;
+      margin: auto;
+      text-align: center;
+   }

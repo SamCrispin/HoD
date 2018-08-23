@@ -14,6 +14,49 @@ var interactions = {
         opt1Onclick: "buildOpen",
         opt1open: "inventory"
     },
+    'openingScrBoss': {                        //Boss Fight
+        out: "The cave you've meandered into seems darker than any others that you've seen before, you can barely see your hand in front of your face. A creeping sense of dread is accompanying the intense surrounding black. You continue deeper nonetheless. " +
+        "You turn a corner and start to hear a periodic rumbling, the sound is reverberating around you and even shaking the rock beneath your feet.",
+        opt1: "1.   Continue",
+        opt1Onclick: "interaction.no0"
+    },
+    'boss1': {
+        out: "Much against your better judgement, you tentatively carry on forwards, making sure to keep your footing on the rumbling ground beneath you. A painfully loud crashing behind you makes you jump out of your skin and you spin around to see " +
+        "a massive stalactite shattered on the floor blocking your exit. You don't wait around to see if any other fancy rock formations are dropping from the ceiling and hastily make your way to the other end of the rocky corridor.",
+        opt1: "1.   Continue",
+        opt1Onclick: "changeOut",
+        opt1chance: 100,
+        opt1open1: "boss2"
+    },
+    'boss2': {
+        out: "Passing under the naturally formed rock arch, you see it. The Heart Of Demaxius. Sitting on top of a pile of other treasure, the redemption for your family's name, your ticket for a role in the army, what you've dedicated years of your life " +
+        "researching and looking for. You now stand in front of it, separated only by a 15 feet tall cave troll that was just woken up by the falling stalactite that only narrowly missed you. You don't know much about cave trolls, but one thing you do " +
+        "know is the fact that waking up a cave troll before it wants to is a death sentence. You didn't wake him up... but he doesn't know that...",
+        opt1: "1.   Well shit",
+        opt1Onclick: "buildFight",
+        opt1enemy: "Cave Troll",
+        opt1interaction: "bossFight"
+    },
+    'notBoss': {
+        out: "That sound is deep enough that the beast it came from could easily be twice the size of you, you think it best to not venture any further yet and turn to walk away.",
+        opt1: "1.   Maybe another time",
+        opt1Onclick: "buildOpen",
+        opt1open: "map"
+    },
+    'victory': {                            //Win
+        out: "You land your last blow onto the troll, and it staggers. It falls to its knees, and then to to its front with a tremendous crash. As the adrenaline starts draining from your veins and you regain composure, " +
+        "you remember what you came here for. You step over the giant body of your fallen foe and towards the Heart of Demaxius.",
+        opt1: "1.   Shiny...",
+        opt1Onclick: "victory2"
+    },
+    'victory2': {
+        out: "Holding your prize in your hands almost doesn't feel real, you stare in awe at the gemstones' detail, even after all these years its been sitting in a cave. Snapping out of your entrancement, you hurry to the exit not wanting to wait for " +
+        "any more cave trolls. They may be solitary beasts but you'd rather not risk it. You dig your way out of the cave and make the long journey back to the town to rest up before the longer journey back home. You can't wait to see the looks on " +
+        "your family's faces...",
+        opt1: "1.   Continue",
+        opt1Onclick: "buildOpen",
+        opt1open: "finalScreen"
+    },
     'openingScr1': {						//Interaction 1
         out: "You enter the cave to hear the cackling of a small band of cave goblins and see the flickering light of a campfire round the corner. One of the goblins shockingly acute sense of smell catches onto your "
         + "intrusion and before you can react, leaps round the corner, ready to fight.",
@@ -233,7 +276,8 @@ var interactions = {
         out: "With only a small dent to your dignity, you turn and walk away, being booed and jeered by the now angry fire spirits as you go.",
         opt1: "1.	At least I keep my weapon...",
         opt1Onclick: "buildOpen",
-        opt1open: "map"
+        opt1open: "map",
+        opt1interaction: 8
     },
     'broke8': {
         out: "You give the weapon a mighty tug and you fall backwards as it comes loose from the tree. Feeling triumphant, you look at your newly acquired equipment just to realise that half of it is still stuck in the tree. It hadn't come loose. It had broke. You hear the laughing and sniggering "
@@ -313,15 +357,16 @@ var interactions = {
         "he yells, \"CARE TO LOOK AT MY WARES!\", even louder this time. You glance at the stuff on sale and it looks in good enough nick, although you aren't quite sure about the shop owner...",
         opt1: "1.   I could do with a new pair of boots, why not",
         opt1Onclick: "interaction.no10",
-        opt2: "2.   You don't fancy risking your life for a quick shop, leave",
+        opt2: "2.   You don't like the look in the \'shop\' keepers eyes, leave before anything bad happens",
         opt2Onclick: "changeOut",
         opt2chance: 100,
         opt2open1: "leave10"
     },
     'leave10': {
         out: "The unsettling smile on the \'shopkeepers\' face was a bit too much for you, you decide to leave the man and his wares to themselves. \"N-NO TRAVELLER, C-C-COME BACK!\", you turn to see he's left " +
-        "shop and is chasing you down the road. \"LOOK AT MY WARES! THEY'RE AMAZING!\". You outrun the crazed shopkeeper easily enough and carry on down the road.",
-        opt1Onclick: "buildOut",
+        "his shop and is chasing you down the road. \"LOOK AT MY WARES! THEY'RE AMAZING!\". You outrun the crazed shopkeeper easily enough and carry on down the road.",
+        opt1: "1.   Continue",
+        opt1Onclick: "buildOpen",
         opt1open: "map",
         opt1interaction: 10
     }
@@ -374,9 +419,9 @@ function setOutputDiv(chance, interaction1, interaction2, characteristic, limit)
         /** unused so far but may be in future
          * opt2E.setAttribute("characteristic", (interaction.opt2char) ? interaction.opt2char : null);
          * opt2E.setAttribute("limit", (interaction.opt2limit) ? interaction.opt2limit : null);
-         * opt1E.setAttribute("open", (interaction.opt2open) ? interaction.opt2open : null);
-         * opt1E.setAttribute("enemy", (interaction.opt2enemy) ? interaction.opt2enemy : null);
-         * opt1E.setAttribute("interaction", (interaction.opt2interaction) ? interaction.opt2interaction : null);
+         * opt2E.setAttribute("open", (interaction.opt2open) ? interaction.opt2open : null);
+         * opt2E.setAttribute("enemy", (interaction.opt2enemy) ? interaction.opt2enemy : null);
+         * opt2E.setAttribute("interaction", (interaction.opt2interaction) ? interaction.opt2interaction : null);
          */
         opt2E.setAttribute("opt2Func", interaction.opt2Onclick);
     }

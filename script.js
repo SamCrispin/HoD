@@ -4,7 +4,8 @@ var mapObj = {},
         innOpen = Math.floor(Math.random() * 2),
         innOut = Math.floor(Math.random() * 3) + 1,
         innSlept = false,
-        inBattle = false;
+        inBattle = false,
+        playthroughNo = 0;
 
 var player = {
 
@@ -41,9 +42,11 @@ var player = {
         player.changeHealth(0);
         player.changeGold(0);
         player.setUpEquipment();
+        player.updateStats()
     },
 
     setUpEquipment: function () {
+        player.equipped = [];
         for (var i = 0; i < 6; i++) {
             var item = new Item;
             switch (i) {
@@ -85,23 +88,36 @@ var player = {
             healthChanged = true;
         }
         if (player.health.current <= 0) {
-            player.die();
+            player.health.current = 0;
         }
         if (player.health.current > (player.health.base + player.health.bonus)) {
             player.health.current = (player.health.base + player.health.bonus);
         }
+        if (health === 0) {
+            player.health.bonus = 0;
+            player.health.current = 100;
+        }
         document.getElementById("healthBar").style.width = ((player.health.current / (player.health.base + player.health.bonus)) * 100) + "%";
         document.getElementById("healthLabel").innerHTML = player.health.current + "/" + (player.health.base + player.health.bonus) + "hp";
+        if (player.health.current == 0) {
+            player.die();
+        }
         return healthChanged;
     },
 
     changeGold: function (gold) {
-        if (gold > player.gold) {
-            return false;
+        if (gold < 0) {
+            gold = -gold;
+            if (gold > player.gold) {
+                return false;
+            }
+            player.gold -= gold;
+            document.getElementById("gold").innerHTML = player.gold + " gold";
+            return true;
+        } else if (gold > 0) {
+            player.gold += gold;
         }
-        player.gold -= gold;
         document.getElementById("gold").innerHTML = player.gold + " gold";
-        return true;
     },
 
     updateStats: function () {
@@ -119,10 +135,10 @@ var player = {
         this.changeHealth(0);
     },
 
-    changeStat: function (stat, amount) {
+    /*changeStat: function (stat, amount) {
         player[stat].base += amount;
         player.updateStats();
-    },
+    },*/
 
     die: function () {
         nav.open('defeat');
@@ -137,16 +153,21 @@ var nav = {
     prevOpenDiv: "",
 
     open: function (ID, compID) {
-        var list = document.getElementsByClassName('outputDiv');
-        var interactionID;
+        var list = document.getElementsByClassName('outputDiv'), interactionID = "", count = 1;
 
         if (ID.includes('output')) {
-            interactionID = parseInt(ID.slice(ID.length - 1)) + 1;
-            if (mapObj[interactionID].complete) {
-                return;
+            while (parseInt(ID.slice(ID.length - count)) || parseInt(ID.slice(ID.length - count)) === 0) {
+                interactionID = parseInt(ID.slice(ID.length - count));
+                count++;
             }
-            ID = ID.slice(0, ID.length - 1);
-            setOutputDiv(100, 'openingScr' + interactionID);
+            if (interactionID !== "") {
+                interactionID = (interactionID === 0) ? "Boss" : interactionID;
+                if (mapObj[interactionID].complete) {
+                    return;
+                }
+                ID = ID.slice(0, ID.length - (count - 1));
+                setOutputDiv(100, 'openingScr' + interactionID);
+            }
         }
         for (var i = 0; i < list.length; i++) {
             if (list[i].style.display == 'block') {
@@ -160,11 +181,13 @@ var nav = {
         if (typeof compID != "undefined" && compID != "null") {
             pointsCleared++;
             mapObj[compID].complete = true;
+            document.getElementById("coord" + mapObj[compID].Y + "," + mapObj[compID].X).style.backgroundImage = "url(img/mapIconDone.png)"
         }
 
         if (ID == "loot") genLoot();
         document.getElementById('shopAnnouncement').style.display = 'none';
         document.getElementById('backButton').style.display = 'none';
+        document.getElementById('doneButton').style.display = 'none';
         document.getElementById(ID).style.display = 'block';
     },
 
@@ -190,7 +213,11 @@ var fight = {
     setUpFight: function (enemyType, interaction) {
         this.interactionNo = interaction;
         nav.open('fight');
-        this.enemy = this.genEnemy(enemyType);
+        if (interaction != "bossFight") {
+            this.enemy = this.genEnemy(enemyType);
+        } else {
+            this.enemy = new Enemy(enemyType, 100, 100, null, 5, 5);
+        }
         inBattle = true;
         this.changeEnemyHealth(0);
         document.getElementById('enemyHealthBarBG').style.display = 'block';
@@ -198,8 +225,7 @@ var fight = {
         document.getElementById('playerName').style.color = 'yellow';
         document.getElementById('enemyName').innerHTML = this.enemy.name;
 
-        var randInt = Math.floor(Math.random() * 5) + 1;
-        if (randInt > 4) {
+        if (Math.random() > 0.8) {
             this.enemy.intention = 'block';
         } else {
             this.enemy.intention = 'attack';
@@ -270,7 +296,7 @@ var fight = {
             this.attack(false)
         }
         else if (this.enemy.intention == 'block') {
-            this.enemy.defense = (Math.floor(this.enemy.defense * 1.1) == this.enemy.defense) ? (this.enemy.defense + 1) : (this.enemy.defense * 1.1);
+            this.enemy.defense = (Math.floor(this.enemy.defense * 1.1) == this.enemy.defense) ? (this.enemy.defense + 1) : Math.round(this.enemy.defense * 1.1);
             this.outputStats();
         }
         this.playerTurn = true;
@@ -305,7 +331,6 @@ var fight = {
         var enemy = new Enemy;
         var scalar = (pointsCleared / pointNo);
         scalar = (scalar < 0.2) ? 0.2 : scalar;
-        var power = 100 * scalar;
 
         enemy.name = type;
         enemy.attack = Math.floor(((Math.random() * 15) + 30) * scalar);
@@ -319,8 +344,13 @@ var fight = {
     victory: function () {
         document.getElementById('enemyHealthBarBG').style.display = 'none';
         document.getElementById('enemyHealthLabel').style.display = 'none';
-        mapObj[this.interactionNo].complete = true;
-        nav.open('victoryScreen');
+        if (this.interactionNo != "bossFight") {
+            mapObj[this.interactionNo].complete = true;
+            nav.open('victoryScreen', this.interactionNo);
+        } else {
+            nav.open("output");
+            setOutputDiv(100, "victory");
+        }
         inBattle = false;
     }
 
@@ -380,12 +410,12 @@ function invItemHoverOut() {
 }
 
 function genMap() {
-    var pointCoord = 0;
-    var x = 0, y = 0;
-    var div;
+    var pointCoord, x, y, div;
 
+    document.getElementById("map").innerHTML = "";
+    mapObj = {};
     //pointNo = Math.floor((Math.random() * 5) + 15);
-    pointNo = 8;
+    pointNo = 10;
 
     mapObj.town = {};
     mapObj.town.X = 30;
@@ -396,39 +426,53 @@ function genMap() {
     div.className = 'iconCoord';
     div.setAttribute('onclick', 'nav.open("town")');
     document.getElementById('map').appendChild(div);
-
     genTown();
 
-    for (var k = 0; k < pointNo; k++) {
+    pointCoord = Math.floor(Math.random() * 600);
+    y = Math.floor(pointCoord / 30) + 1;
+    x = ((pointCoord % 30) + 1);
+    mapObj.Boss = {};
+    mapObj.Boss.X = x;
+    mapObj.Boss.Y = y;
+    mapObj.Boss.complete = false;
+
+    div = document.createElement('div');
+    div.id = 'bossFight';
+    div.className = 'iconCoord';
+    div.setAttribute('onclick', 'nav.open("output0")');
+    div.style.left = ((x * 20) - 10) + 'px';
+    div.style.top = ((y * 20) - 10) + 'px';
+    document.getElementById('map').appendChild(div);
+
+    for (var i = 0; i < pointNo; i++) {
         pointCoord = Math.floor(Math.random() * 600);
         y = Math.floor(pointCoord / 30) + 1;
         x = ((pointCoord % 30) + 1);
-
         for (var key in mapObj) {
             if (mapObj[key].X != x || mapObj[key].Y != y) {
-                div = document.createElement('div');
-                div.className = 'iconCoord';
-                div.id = 'coord' + (y) + ',' + (x);
-                div.setAttribute('onclick', 'nav.open("output' + k + '")/*, setOutputDiv(100, "openingScr' + (k + 1) + '")*/');
-                div.style.left = ((x * 20) - 10) + 'px';
-                div.style.top = ((y * 20) - 10) + 'px';
-                document.getElementById('map').appendChild(div);
-
-                mapObj[k + 1] = {};
-                mapObj[k + 1].X = x;
-                mapObj[k + 1].Y = y;
-                mapObj[k + 1].complete = false;
+                mapObj[i + 1] = {};
+                mapObj[i + 1].X = x;
+                mapObj[i + 1].Y = y;
+                mapObj[i + 1].complete = false;
             } else {
-                k--;
+                i--;
                 break;
             }
         }
+        div = document.createElement('div');
+        div.id = 'coord' + (y) + ',' + (x);
+        div.className = 'iconCoord';
+        div.setAttribute('onclick', 'nav.open("output' + (i+1) + '")');
+        div.style.left = ((x * 20) - 10) + 'px';
+        div.style.top = ((y * 20) - 10) + 'px';
+        document.getElementById('map').appendChild(div);
     }
 }
 
 function genTown() {
     var randInt = (Math.floor(Math.random() * 3) + 1);
     var div;
+    document.getElementById("town").innerHTML = "";
 
     switch (randInt) {
         case 1:
@@ -896,10 +940,7 @@ function genItem(inShop, type) {
 }
 
 function genLoot() {
-    var itemNoSel = Math.random();
-    var itemNo;
-    var output = "";
-    var items = [];
+    var itemNoSel = Math.random(), itemNo, output = "", items = [], div;
 
     if (itemNoSel < 0.6) {
         itemNo = 1
@@ -916,7 +957,7 @@ function genLoot() {
         do {
             items[i] = genItem(false);
         } while (items[i].consumable === true);
-        var div = document.createElement('div');
+        div = document.createElement('div');
         div.className = 'lootItem';
         div.id = 'lootItem' + i;
         div.setAttribute('itemId', "" + i);
@@ -936,6 +977,21 @@ function genLoot() {
         document.getElementById('loot').appendChild(div);
         document.getElementById('lootItem' + i).innerHTML = output;
     }
+    div = document.createElement('div');
+    div.className = 'lootItem gold';
+    div.id = 'lootItem' + i;
+    div.setAttribute('itemId', "" + i);
+    div.style.backgroundImage = "url(img/gold.png)";
+    div.style.top = (i + 1) * 120 + "px";
+    div.style.lineHeight = "100px";
+    var gold = Math.floor(Math.random()*20) + 10;
+    div.innerHTML = gold + " Gold";
+    div.setAttribute("gold", "" + gold);
+    div.onclick = function (e) {
+        player.changeGold(parseInt(e.target.getAttribute("gold")));
+        document.getElementById('loot').removeChild(this);
+    };
+    document.getElementById('loot').appendChild(div);
 }
 
 function populateShop(shop) {
@@ -983,7 +1039,7 @@ function populateShop(shop) {
 function buyItem(shop, pos, y, x) {
     var item = eval(shop.id + 'Items[' + pos + ']');
     var price = item.cost;
-    var sold = player.changeGold(price);
+    var sold = player.changeGold(-price);
 
     document.getElementById('shopAnnouncement').style.display = 'block';
     if (sold && item != "") {
@@ -1017,19 +1073,28 @@ function buyItem(shop, pos, y, x) {
 }
 
 function popInv(item) {
-    var x = 1;
+    var x = 1, count = 0;
     var output = "";
-    var list = document.getElementsByClassName(item + 'Inv');
+    var currentItemDivs = document.getElementsByClassName(item + 'Inv'), listLength = currentItemDivs.length;
 
     player.inventory.sort(compare);
-    for (var i = 0; i < list.length; i++, x++) {
-        document.getElementById(item + 'Inv').removeChild(document.getElementById(item + 'InvNo' + x));
-    }
+   /* for (var i = 0; i < listLength; i++) {
+        if ((player.inventory[i].type == item || ((item == 'weapon') && (player.inventory[i].type == 'sword' || player.inventory[i].type == 'staff'))
+                || ((item == 'cons') && (player.inventory[i].type == 'potion' || player.inventory[i].type == 'food'))) || item == 'full') {
+            document.getElementById(item + 'Inv').removeChild(document.getElementById(item + 'InvNo' + x));
+            x++;
+        }
+    }*/
 
+    if (listLength !== 0) {
+        for (var i = 0; i < listLength; i++) {
+            document.getElementById(item + "Inv").removeChild(document.getElementById(currentItemDivs[i - count].id));
+            count++;
+        }
+    }
     x = 1;
 
-    for (i = 0; i < player.inventory.length; i++, x++) {
-
+    for (i = 0; i < player.inventory.length; i++) {
         if ((player.inventory[i].type == item || ((item == 'weapon') && (player.inventory[i].type == 'sword' || player.inventory[i].type == 'staff'))
                 || ((item == 'cons') && (player.inventory[i].type == 'potion' || player.inventory[i].type == 'food'))) || item == 'full') {
             var div = document.createElement('div');
@@ -1054,6 +1119,7 @@ function popInv(item) {
             }
             document.getElementById(item + 'tooltiptext' + x).innerHTML = output;
             output = "";
+            x++;
         }
     }
 }
@@ -1078,6 +1144,7 @@ function equipItem(pos, itemType) {
             }
             player.equipped[i] = player.inventory[pos];
             player.inventory.splice(pos, 1);
+            player.updateStats();
             player.changeHealth(player.equipped[i].health);
             popInv(itemType.id);
             player.updateStats();
@@ -1121,6 +1188,13 @@ function fadeIn(elementId) {
 }
 
 var interaction = {
+    no0: function () {
+        if (pointsCleared == pointNo) {
+            setOutputDiv(100, "boss1");
+        } else {
+            setOutputDiv(100, "notBoss");
+        }
+    },
     no8: function () {
         var sel = Math.random(), item = {}, prevAtck, sword = true;
         if (player.equipped[5].type == 'sword') {
@@ -1142,7 +1216,7 @@ var interaction = {
             item.power = 0;
             player.equipped[5] = item;
             interactions.broke8.opt1Onclick = "nav.open('inventory')";
-            nav.open('broke8');
+            changeOut('broke8');
             setOutputDiv(100, 'broke8');
         } else if (sel < 0.6) {
             item = genItem(false, item.type);
@@ -1153,7 +1227,7 @@ var interaction = {
                 item.intelligence = prevAtck * 0.8;
             }
             interactions.bad8.opt1Onclick = "nav.open('inventory')";
-            nav.open('bad8');
+            changeOut('bad8');
         } else if (sel < 0.9) {
             item = genItem(false, item.type);
             if (sword) {
@@ -1163,7 +1237,7 @@ var interaction = {
                 item.intelligence = prevAtck * 1.2;
             }
             interactions.good8.opt1Onclick = "nav.open('inventory')";
-            nav.open('good8');
+            changeOut('good8');
         } else {
             item = genItem(false, item.type);
             if (sword) {
@@ -1173,19 +1247,20 @@ var interaction = {
                 item.intelligence = prevAtck * 1.5;
             }
             interactions.great8.opt1Onclick = "nav.open('inventory')";
-            nav.open('great8');
+            changeOut('great8');
         }
     },
     no10: function() {
         populateShop('merchant');
         nav.open('merchant');
+        document.getElementById("doneButton").style.display = "block";
     }
 };
 
 function setup() {
     genMap();
     setOutputDiv(100, 'startingMenu');
-    document.getElementById('output').style.display = 'block';
+    nav.open("output");
     invItemHoverOut();
     player.setUpPlayer();
 
@@ -1194,32 +1269,48 @@ function setup() {
     document.getElementById('blueOpt').addEventListener("click", optionBlueClick);
 }
 
+/*function quit() {
+
+}*/
+
+function continuePlaythrough() {
+    genMap();
+    setOutputDiv(100, 'startingMenu');
+    nav.open("output");
+    playthroughNo++;
+}
+
 function option1Click(e) {
     var t = e.target;
-    var func = t.getAttribute("opt1Func");
-    if (func) window[func](e);
+    var func = t.getAttribute("opt1Func"), funcNo, funcName;
+    if (func.includes(".")) {
+        var pointIndex = func.indexOf(".");
+        funcName = func.slice(0, pointIndex);
+        funcNo = func.slice(pointIndex + 1);
+        window[funcName][funcNo]();
+    } else if (func) window[func](e);
 }
 
 function option2Click(e) {
     var t = e.target;
-    var func = t.getAttribute("opt2Func");
-    if (func) window[func](e);
+    var func = t.getAttribute("opt2Func"), funcNo, funcName;
+    if (func.includes(".")) {
+        var pointIndex = func.indexOf(".");
+        funcName = func.slice(0, pointIndex);
+        funcNo = func.slice(pointIndex + 1);
+        window[funcName][funcNo]();
+    } else if (func) window[func](e);
 }
 
 function optionBlueClick(e) {
     var t = e.target;
-    var func = t.getAttribute("optBlueFunc");
-    if (func) window[func](e);
+    var func = t.getAttribute("blueOptFunc"), funcNo, funcName;
+    if (func.includes(".")) {
+        var pointIndex = func.indexOf(".");
+        funcName = func.slice(0, pointIndex);
+        funcNo = func.slice(pointIndex + 1);
+        window[funcName][funcNo]();
+    } else if (func) window[func](e);
 }
 
 window.onload = setup;
-/** CHANGES
- * refactoring
- */
-
-/** HELP
- */
-
-/** PLANS
- * Enumerated string for item types
- */

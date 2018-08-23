@@ -97,6 +97,7 @@
         <p id="innPara2"></p>
     </div>
     <div id="backButton" onclick="nav.back()"></div>
+    <div id="doneButton" onclick="nav.open('map', 10)"></div>
     <div id="shopAnnouncement"></div>
 
     <div class="outputDiv" id="output">
@@ -107,15 +108,24 @@
     </div>
 
     <div class="outputDiv interaction" id="victoryScreen">
-        <div id="victoryMessage1">Victory!</div>
-        <div id="victoryMessage2" onclick="nav.open('loot')">Continue</div>
+        <div class="message1">Victory!</div>
+        <div class="message2" id="victory2" onclick="nav.open('loot')">Continue</div>
     </div>
 
-    <div class="outputDiv interaction" id="defeat">You lost</div>
+    <div class="outputDiv interaction" id="defeat">
+        <div class="message1">You lost!</div>
+        <div class="message2" id="restart" onclick="setup()">Play Again</div>
+    </div>
 
     <div class="outputDiv interaction" id="loot">
         <div id="lootMessage">Collect your loot!</div>
         <div id="lootCont" onclick="nav.open('map')"></div>
+    </div>
+
+    <div class="outputDiv interaction" id="finalScreen">
+        <div class="message1" id="win">You win!</div>
+        <div class="message2" id="continue" onclick="continuePlaythrough()">Continue playthrough</div>
+        <div class="message2" id="playAgain" onclick="setup()">Play again</div>
     </div>
 
 </div>
