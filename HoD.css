@@ -177,35 +177,35 @@ body {
 	}
 	
 	#weapon {
-		background-image: url("img/sword.png");
+		background-image: url("img/swordSmall.png");
 		left: 415px;
 	}
 
 	#amulet {
-		background-image: url("img/amulet.png");
+		background-image: url("img/amuletSmall.png");
 		left: 515px;
 	}
 
 	#helmet {
-		background-image: url("img/helmet.png");
+		background-image: url("img/helmetSmall.png");
 		left: 415px;
 		top: 110px;
 	}
 
 	#armour {
-		background-image: url("img/armour.png");
+		background-image: url("img/armourSmall.png");
 		left: 515px;
 		top: 110px;
 	}
 
 	#leggings {
-		background-image: url("img/leggings.png");
+		background-image: url("img/leggingsSmall.png");
 		left: 415px;
 		top: 210px;
 	}
 
 	#boots {
-		background-image: url("img/boots.png");
+		background-image: url("img/bootsSmall.png");
 		left: 515px;
 		top: 210px;
 	}
@@ -269,7 +269,7 @@ body {
 	}
 
 	#loot {
-		overflow-y: hidden;
+		overflow-y: scroll;
 	}
 
    #loot::-webkit-scrollbar {
@@ -304,7 +304,7 @@ body {
 	}
 	
 	#lootCont {
-		background-color: white;
+		background-image: url("img/forwardButton.png");
 		width: 50px;
 		height: 20px;
 		position: absolute;
@@ -313,7 +313,7 @@ body {
 	}
 	
 	#lootCont:hover {
-		background-color: yellow;
+		background-image: url("img/forwardButtonHover.png");
 	}
 
    .message1 {
@@ -378,7 +378,7 @@ body {
 	}
 
 	#backButton {
-		background-color: white;
+		background-image: url("img/backButton.png");
 		width: 50px;
 		height: 20px;
 		margin: auto;
@@ -386,11 +386,11 @@ body {
 	}
 
 	#backButton:hover {
-		background-color: yellow;
+		background-image: url("img/backButtonHover.png");
 	}
 
 	#doneButton {
-		background-color: white;
+		background-image: url("img/forwardButton.png");
 		width: 50px;
 		height: 20px;
 		margin: auto;
@@ -398,7 +398,7 @@ body {
 	}
 
 	#doneButton:hover {
-		background-color: yellow;
+		background-image: url("img/forwardButtonHover.png");
 	}
 	
 	#shopAnnouncement {
@@ -435,7 +435,30 @@ body {
 		z-index: 1;
 	}
 
+	.tooltip .tooltiptextLeft {
+		background-color: black;
+		width: 150px;
+		border: 5px solid white;
+		border-radius: 6px;
+		padding: 5px;
+		position: absolute;
+		right: 110%;
+		top: -5px;
+		visibility: hidden;
+		text-align: left;
+		text-transform: capitalize;
+		color: #fff;
+		opacity: 0;
+		transition: opacity 0.5s;
+		z-index: 1;
+	}
+
 	.tooltip:hover .tooltiptext {
+		visibility: visible;
+		opacity: 1;
+	}
+
+	.tooltip:hover .tooltiptextLeft {
 		visibility: visible;
 		opacity: 1;
 	}
@@ -564,3 +587,8 @@ body {
       margin: auto;
       text-align: center;
    }
+
+/*victory*/
+	#playAgain {
+		top: 250px;
+	}
